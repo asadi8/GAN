@@ -4,8 +4,8 @@ import os,sys
 import generator,critic,g_c
 import utils
 K.set_image_dim_ordering('th')
-
-def train():
+STATE_SHAPE=(1,28,28)
+def train(STEP_SIZE_CRITIC,STEP_SIZE_G_C,BATCH_SIZE,TOTAL_ITERATIONS,NOISE_SIZE,C_UPDATES_PER_G_UPDATE,CLIP_THRESHOLD,run):
 
     X_Y_train,X_train=utils.build_data()
     critic_network=critic.critic_class(STATE_SHAPE,STEP_SIZE_CRITIC,CLIP_THRESHOLD)
@@ -23,8 +23,8 @@ def train():
         g_c_loss=g_c_network.update(NOISE_SIZE,BATCH_SIZE,X_train,critic_network)
 
         #save sampled fake and real images
-        utils.save_image(iteration_number,fake_X_Y,"fake","wgan-output")
-        utils.save_image(iteration_number,real_X_Y,"real","wgan-output")
+        utils.save_image(iteration_number,fake_X_Y,"fake","wgan-output-"+str(run))
+        #utils.save_image(iteration_number,real_X_Y,"real","wgan-output")
 
 STATE_SHAPE=(1,28,28)
 STEP_SIZE_CRITIC=0.00005
@@ -34,5 +34,3 @@ TOTAL_ITERATIONS=100000
 NOISE_SIZE=100
 C_UPDATES_PER_G_UPDATE=10
 CLIP_THRESHOLD=0.01
-
-train()
