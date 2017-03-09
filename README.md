@@ -1,3 +1,3 @@
 # GAN
-run => python gan.py
-or     python wgan.py
+python gan.py
+or python wgan.py
