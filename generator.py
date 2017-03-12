@@ -8,7 +8,7 @@ from keras.optimizers import SGD, RMSprop
 class generator_class:
 	model=[]
 	NOISE_SIZE=100
-	ACTIVATION_FUNCTION="tanh"
+	ACTIVATION_FUNCTION="relu"
 	def __init__(self,input_shape,NOISE_SIZE):
 		self.NOISE_SIZE=NOISE_SIZE
 		self.model=self.build_dense(input_shape)
@@ -20,10 +20,12 @@ class generator_class:
 		y=Convolution2D(64, 5, 5,border_mode='same')(state)
 		y=Activation(self.ACTIVATION_FUNCTION)(y)
 		y=MaxPooling2D(pool_size=(2, 2))(y)
-		y=Convolution2D(128, 5, 5)(y)
+		y=Convolution2D(64, 5, 5)(y)
 		y=Activation(self.ACTIVATION_FUNCTION)(y)
 		y=MaxPooling2D(pool_size=(2, 2))(y)
 		y=Flatten()(y)
+		y=Dense(1024)(y)
+		y=Activation(self.ACTIVATION_FUNCTION)(y)
 		y_z=merge([y,z],mode="concat")
 
 		x=Dense(1024)(y_z)
