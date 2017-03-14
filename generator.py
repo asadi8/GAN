@@ -41,7 +41,7 @@ class generator_class:
 		x=Activation(self.ACTIVATION_FUNCTION)(x)
 		x=UpSampling2D(size=(2, 2))(x)
 		x=Convolution2D(1, 5, 5, border_mode='same')(x)
-		x=Activation('tanh')(x)
+		x=Activation('sigmoid')(x)
 		output=merge([state,x],mode="concat")
 		return Model(input=[state, z], output=[output])
 
