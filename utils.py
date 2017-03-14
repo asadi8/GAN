@@ -4,7 +4,7 @@ import argparse
 import math
 import keras.backend as K
 import os,sys
-import scipy
+import scipy.misc
 
 def save_image(update,generated_images,fake_or_real,folder):
     image = combine_images(generated_images)
@@ -41,8 +41,9 @@ def build_data():
                 name_y="gray/"+y_epsiode+"_"+str(int(y_timestep)+1)+".png"
                 y=scipy.misc.imread(name_y)
                 y=(np.mean(y,axis=2)- 127.5)/127.5
-            except:
-                #print(name)
+            except Exception as e:
+                print(name)
+                print(str(e))
                 #print("terminal state")
                 continue
             x=scipy.misc.imread("gray/"+name)

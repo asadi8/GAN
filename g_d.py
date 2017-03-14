@@ -21,7 +21,9 @@ class g_d_network:
 		random_X=X_train[random_indices_X,:,:,:]
 		discriminator_network.model.trainable=False
 		input_g_d=[random_X,noise_matrix]
+		print("value of fake before GAN update:",np.mean(self.model.predict(input_g_d)))
 		output_g_d=[1] * BATCH_SIZE
 		g_d_loss=self.model.train_on_batch(input_g_d,output_g_d)
+		print("value of fake after GAN update:",np.mean(self.model.predict(input_g_d)))
 		discriminator_network.model.trainable=True
 		return g_d_loss

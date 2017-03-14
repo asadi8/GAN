@@ -4,38 +4,40 @@ from keras.layers.core import Activation, Flatten
 from keras.layers.normalization import BatchNormalization
 from keras.layers.convolutional import Convolution2D, MaxPooling2D, UpSampling2D
 from keras.optimizers import SGD, RMSprop
+import keras.backend as K
+import sys
 
 class generator_class:
 	model=[]
 	NOISE_SIZE=100
-	ACTIVATION_FUNCTION="relu"
+	ACTIVATION_FUNCTION="tanh"
+	# add leaky
 	def __init__(self,input_shape,NOISE_SIZE):
 		self.NOISE_SIZE=NOISE_SIZE
-		self.model=self.build_dense(input_shape)
+		self.model=self.build_convolutional(input_shape)
+		print(self.model.summary())
 
 	def build_convolutional(self,state_shape):
 		state=Input(shape=state_shape, name='state')
 		z=Input(shape=(self.NOISE_SIZE,),name="noise")
 
-		y=Convolution2D(64, 5, 5,border_mode='same')(state)
+		y=Convolution2D(32, 5, 5,border_mode='same')(state)
 		y=Activation(self.ACTIVATION_FUNCTION)(y)
 		y=MaxPooling2D(pool_size=(2, 2))(y)
-		y=Convolution2D(64, 5, 5)(y)
+		y=Convolution2D(32, 5, 5,border_mode='same')(y)
 		y=Activation(self.ACTIVATION_FUNCTION)(y)
 		y=MaxPooling2D(pool_size=(2, 2))(y)
 		y=Flatten()(y)
-		y=Dense(1024)(y)
-		y=Activation(self.ACTIVATION_FUNCTION)(y)
 		y_z=merge([y,z],mode="concat")
 
-		x=Dense(1024)(y_z)
+		x=Dense(512)(y_z)
 		x=Activation(self.ACTIVATION_FUNCTION)(x)
-		x=Dense(128*7*7)(x)
+		x=Dense(8*7*7)(x)
 		#x=BatchNormalization()(x)
 		x=Activation(self.ACTIVATION_FUNCTION)(x)
-		x=Reshape((128, 7, 7), input_shape=(128*7*7,))(x)
+		x=Reshape((8, 7, 7), input_shape=(8*7*7,))(x)
 		x=UpSampling2D(size=(2, 2))(x)
-		x=Convolution2D(64, 5, 5, border_mode='same')(x)
+		x=Convolution2D(16, 5, 5, border_mode='same')(x)
 		x=Activation(self.ACTIVATION_FUNCTION)(x)
 		x=UpSampling2D(size=(2, 2))(x)
 		x=Convolution2D(1, 5, 5, border_mode='same')(x)

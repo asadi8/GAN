@@ -8,7 +8,7 @@ import numpy as np
 
 class discriminator_class:
 	model=[]
-	ACTIVATION="relu"
+	ACTIVATION="tanh"
 	STEP_SIZE_DISCRIMINATOR=0.0001
 	def __init__(self,state_shape,STEP_SIZE_DISCRIMINATOR):
 		self.STEP_SIZE_DISCRIMINATOR=STEP_SIZE_DISCRIMINATOR
@@ -23,7 +23,7 @@ class discriminator_class:
 		state=Lambda(lambda x: x[:,:,:,0:state_shape[2]],output_shape=state_shape)(state_state_prime)
 		state_prime=Lambda(lambda x: x[:,:,:,state_shape[2]:state_shape[2]*2],output_shape=state_shape)(state_state_prime)
 		difference=merge([state, state_prime], mode=lambda x: x[0] - x[1], output_shape=lambda x: x[0])
-
+		
 		image = Input(shape=state_shape)
 		x = Convolution2D(32, 5, 5)(image)
 		x=Activation(self.ACTIVATION)(x)
@@ -51,12 +51,18 @@ class discriminator_class:
 
 	def update(self,NOISE_SIZE,BATCH_SIZE,X_train,X_Y_train,generator_network):
 		noise_matrix=np.random.normal(0,1,NOISE_SIZE*BATCH_SIZE).reshape(BATCH_SIZE,NOISE_SIZE)
+		print(len(X_train))
+		print(BATCH_SIZE)
 		random_indices_X=np.random.choice(len(X_train),BATCH_SIZE,replace=False)
 		random_X=X_train[random_indices_X,:,:,:]
 		fake_X_Y = generator_network.model.predict([random_X,noise_matrix], verbose=0)
 		random_indices_X_Y=np.random.choice(len(X_Y_train),BATCH_SIZE,replace=False)
 		real_X_Y=X_Y_train[random_indices_X_Y,:,:,:]
+		print("value of real before discriminator update:",np.mean(self.model.predict(real_X_Y)))
+		print("value of fake before discriminator update:",np.mean(self.model.predict(fake_X_Y)))
 		input_discriminator=np.concatenate((real_X_Y,fake_X_Y))
 		output_discriminator=[1] * BATCH_SIZE + [0] * BATCH_SIZE
 		discriminator_loss = self.model.train_on_batch(input_discriminator, output_discriminator)
+		print("value of real after discriminator update:",np.mean(self.model.predict(real_X_Y)))
+		print("value of fake after discriminator update:",np.mean(self.model.predict(fake_X_Y)))
 		return discriminator_loss,fake_X_Y,real_X_Y

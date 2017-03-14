@@ -29,6 +29,8 @@ class g_c_network:
 		critic_network.model.trainable=False
 		input_g_c=[random_X,noise_matrix]
 		output_g_c=[1] * BATCH_SIZE
+		print("value before wGAN update:",np.mean(self.model.predict(input_g_c)))
 		g_c_loss=self.model.train_on_batch(input_g_c,output_g_c)
+		print("value after wGAN update:",np.mean(self.model.predict(input_g_c)))
 		critic_network.model.trainable=True
 		return g_c_loss
