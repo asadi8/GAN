@@ -3,7 +3,7 @@ import network
 import numpy as np
 import cv2
 
-def train_model(num_steps=-1, gen_name='generator', discr_name='discriminator', disp_interval=100):
+def train_model(num_steps=-1, gen_name='generator', discr_name='discriminator', disp_interval=100, save_interval=10000):
     if num_steps == -1:
         num_steps = np.inf
     i = 1
@@ -22,7 +22,10 @@ def train_model(num_steps=-1, gen_name='generator', discr_name='discriminator', 
         })
 
         if i % disp_interval == 0:
-            cv2.imwrite('./recent.png', 255*gen_image[0])
+            cv2.imwrite('./recent.png', gen_image[0])
+        if i % save_interval == 0:
+            network.saver_discr.save(network.sess, './'+discr_name+'.ckpt')
+            network.saver_gen.save(network.sess, './'+gen_name+'.ckpt')
 
         print i, 'discr', discr_loss, 'gen', gen_loss
         i += 1
