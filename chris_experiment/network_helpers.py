@@ -55,6 +55,7 @@ def unpoolLayer(inp_layer, scale=2):
 
 def upConvolution(inp_layer, filter_size, filter_in, filter_out, rectifier=leakyRelu, bias=0.3, scale=2):
     assert len(inp_layer.get_shape()) == 4
+    [h, w, c] = [x.value for x in inp_layer.get_shape()[1:]]
     unpooled = unpoolLayer(inp_layer, scale)
     #[h, w, d] = [x.value for x in inp_layer.get_shape()[1:]]
     #unpooled = tf.image.resize_nearest_neighbor(inp_layer, (scale*h, scale*w))
@@ -62,7 +63,9 @@ def upConvolution(inp_layer, filter_size, filter_in, filter_out, rectifier=leaky
                          initializer=tf.contrib.layers.xavier_initializer())
     b1 = tf.get_variable('b1', shape=[filter_out], initializer=tf.constant_initializer(bias))
     #c1 = tf.nn.relu(tf.nn.conv2d(unpooled, w1, [1, 1, 1, 1], 'SAME') + b1)
-    c1 = rectifier(tf.nn.conv2d(unpooled, w1, [1, 1, 1, 1], 'SAME') + b1)
+    conv = tf.nn.conv2d_transpose(inp_layer, w1, [32, 2*h, 2*w, filter_out], [1, 2, 2, 1]) + b1
+
+    c1 = rectifier(conv)
     #w2 = tf.get_variable('w2', shape=[2, 2, filter_out, filter_out],
     #                     initializer=tf.contrib.layers.xavier_initializer())
     #b2 = tf.get_variable('b2', shape=[filter_out], initializer=tf.constant_initializer(0.3))
