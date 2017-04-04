@@ -11,7 +11,7 @@ def train_model(num_steps=-1, gen_name='generator', discr_name='discriminator', 
         gen_loss = '-'
         discr_loss = '-'
         data = bh.get_batch(32)
-        noise = bh.get_noise(32, 10)
+        noise = bh.get_noise(32, 100)
         if i % 1 == 0:
             [_, discr_loss] = network.sess.run([network.train_discr, network.discriminator_loss], feed_dict={network.inp_data: data,
                                                                network.inp_noise: noise})

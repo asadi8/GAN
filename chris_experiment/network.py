@@ -29,7 +29,7 @@ def hook_generator(noise):
     return c2
 
 inp_data = tf.placeholder(tf.float32, [None, 28, 28, 1])
-inp_noise = tf.placeholder(tf.float32, [None, 10])
+inp_noise = tf.placeholder(tf.float32, [None, 100])
 
 with tf.variable_scope('generator'):
     GZ = hook_generator(inp_noise)
