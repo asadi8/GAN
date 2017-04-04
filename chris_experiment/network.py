@@ -40,9 +40,9 @@ with tf.variable_scope('discriminator', reuse=True):
 generator_loss = -tf.reduce_mean(tf.log(DGZ))
 discriminator_loss = -(tf.reduce_mean(tf.log(DX)) + tf.reduce_mean(tf.log(1 - DGZ)))
 
-learning_rate = 0.00001
+learning_rate = 0.0001
 train_gen = tf.train.AdamOptimizer(learning_rate).minimize(generator_loss, var_list=nh.get_vars('generator'))
-train_discr = tf.train.AdamOptimizer(learning_rate/50.).minimize(discriminator_loss, var_list=nh.get_vars('discriminator'))
+train_discr = tf.train.AdamOptimizer(learning_rate).minimize(discriminator_loss, var_list=nh.get_vars('discriminator'))
 
 saver_gen = tf.train.Saver(var_list=nh.get_vars('generator'))
 saver_discr = tf.train.Saver(var_list=nh.get_vars('discriminator'))
