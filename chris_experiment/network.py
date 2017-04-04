@@ -18,12 +18,12 @@ def hook_generator(noise):
     with tf.variable_scope('fc1'):
         fc1 = nh.fullyConnected(noise, 100, bias=0.0)
     with tf.variable_scope('fc2'):
-        fc2 = nh.fullyConnected(fc1, 7*7*64, bias=0.0)
-        fc2 = tf.reshape(fc2, [-1, 7, 7, 64])
+        fc2 = nh.fullyConnected(fc1, 7*7*10, bias=0.0)
+        fc2 = tf.reshape(fc2, [-1, 7, 7, 10])
     with tf.variable_scope('c1'):
-        c1 = nh.upConvolution(fc2, 5, 64, 32, bias=0.0)
+        c1 = nh.upConvolution(fc2, 5, 10, 5, bias=0.0)
     with tf.variable_scope('c2'):
-        c2 = nh.upConvolution(c1, 5, 32, 1, rectifier=tf.nn.sigmoid, bias=0.0)
+        c2 = nh.upConvolution(c1, 5, 5, 1, rectifier=tf.nn.sigmoid, bias=0.0)
     return c2
 
 inp_data = tf.placeholder(tf.float32, [None, 28, 28, 1])
