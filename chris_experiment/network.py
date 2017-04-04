@@ -3,13 +3,14 @@ import numpy as np
 import network_helpers as nh
 
 def hook_discriminator(inp):
-    with tf.variable_scope('c1'):
-        c1 = nh.downConvolution(inp, 5, 1, 1, 5, conv_stride=2) # 14 x 14 x 32
-    with tf.variable_scope('c2'):
-        c2 = nh.downConvolution(c1, 5, 1, 5, 10, conv_stride=2) # 7 x 7 x 64
-        c2 = tf.reshape(c2, [-1, 7*7*10])
+    #with tf.variable_scope('c1'):
+    #    c1 = nh.downConvolution(inp, 5, 1, 1, 5, conv_stride=2) # 14 x 14 x 32
+    #with tf.variable_scope('c2'):
+    #    c2 = nh.downConvolution(c1, 5, 1, 5, 10, conv_stride=2) # 7 x 7 x 64
+    #    c2 = tf.reshape(c2, [-1, 7*7*10])
+
     with tf.variable_scope('fc1'):
-        fc1 = nh.fullyConnected(c2, 100, bias=0)
+        fc1 = nh.fullyConnected(inp, 100, bias=0)
     with tf.variable_scope('fc2'):
         out = nh.fullyConnected(fc1, 1, rectifier=tf.nn.sigmoid, bias=0.0)
     return out
