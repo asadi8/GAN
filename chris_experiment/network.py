@@ -18,19 +18,26 @@ def hook_discriminator(inp):
     return out
 
 def hook_generator(noise):
-    with tf.variable_scope('fc1'):
-        fc1 = nh.fullyConnected(noise, 128*7*7, bias=0.0)
-    fc1 = tf.reshape(fc1, [-1, 7, 7, 128])
+    def sub_generator(noise):
+        with tf.variable_scope('fc1'):
+            fc1 = nh.fullyConnected(noise, 128*7*7, bias=0.0)
+        fc1 = tf.reshape(fc1, [-1, 7, 7, 128])
 
-    #with tf.variable_scope('fc2'):
-    #    fc2 = nh.fullyConnected(fc1, 1000, bias=0.0)
-    #    fc2 = tf.reshape(fc2, [-1, 7, 7, 64])
-    #with tf.variable_scope('fc3'):
-    #    c2 = tf.reshape(nh.fullyConnected(fc2, 28*28*3, rectifier=tf.nn.sigmoid, bias=0.0), [-1, 28, 28, 3])
-    with tf.variable_scope('c1'):
-        c1 = nh.upConvolution(fc1, 5, 128, 64, bias=0.0)
-    with tf.variable_scope('c2'):
-        c2 = nh.upConvolution(c1, 5, 64, 3*5, rectifier=tf.nn.sigmoid, bias=0.0)
+        #with tf.variable_scope('fc2'):
+        #    fc2 = nh.fullyConnected(fc1, 1000, bias=0.0)
+        #    fc2 = tf.reshape(fc2, [-1, 7, 7, 64])
+        #with tf.variable_scope('fc3'):
+        #    c2 = tf.reshape(nh.fullyConnected(fc2, 28*28*3, rectifier=tf.nn.sigmoid, bias=0.0), [-1, 28, 28, 3])
+        with tf.variable_scope('c1'):
+            c1 = nh.upConvolution(fc1, 5, 128, 64, bias=0.0)
+        with tf.variable_scope('c2'):
+            c2 = nh.upConvolution(c1, 5, 64, 3, rectifier=tf.nn.sigmoid, bias=0.0)
+        return c2
+    res = []
+    for i in range(5):
+        with tf.variable_scope('sub_generator', reuse=i>0):
+            res.append(sub_generator(noise[:, :, i]))
+    c2 = tf.concat(3, res)
     return c2
 
 def hook_normal_mapper(X):
