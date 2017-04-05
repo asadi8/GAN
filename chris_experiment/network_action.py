@@ -2,7 +2,29 @@ import tensorflow as tf
 import numpy as np
 import network_helpers as nh
 
-def hook_discriminator(inp):
+
+def process_old_screen_hook(old_screen):
+    with tf.variable_scope('c1'):
+        c1 = nh.downConvolution(old_screen, 5, 1, 3, 128, conv_stride=2) # 14 x 14 x 32
+    with tf.variable_scope('c2'):
+        c2 = nh.downConvolution(c1, 5, 1, 128, 64, conv_stride=2) # 7 x 7 x 64
+        c2 = tf.reshape(c2, [-1, 7*7*64])
+    with tf.variable_scope('fc1'):
+        s_fc1 = nh.fullyConnected(c2, 100, bias=0)
+    return s_fc1
+
+def process_action_hook(action):
+    with tf.variable_scope('fc1'):
+        fc1 = nh.fullyConnected(action, 50, bias=0)
+    with tf.variable_scope('fc2'):
+        fc2 = nh.fullyConnected(fc1, 100, bias=0)
+    return fc2
+
+def hook_discriminator(inp, old_screen, action):
+    with tf.variable_scope('os_proc_gen'):
+        processed_old_screen = process_old_screen_hook(old_screen)
+    with tf.variable_scope('action_proc_gen'):
+        processed_action = process_action_hook(action)
     with tf.variable_scope('c1'):
         c1 = nh.downConvolution(inp, 5, 1, 3, 128, conv_stride=2) # 14 x 14 x 32
     with tf.variable_scope('c2'):
@@ -13,13 +35,25 @@ def hook_discriminator(inp):
         fc1 = nh.fullyConnected(c2, 500, bias=0)
     with tf.variable_scope('fc2'):
         fc2 = nh.fullyConnected(fc1, 100, bias=0.0)
+    pre_class = tf.concat(1, [fc2, processed_old_screen, processed_action])
     with tf.variable_scope('fc3'):
-        out = nh.fullyConnected(fc2, 1, rectifier=tf.nn.sigmoid, bias=0.0)
+        fc3 = nh.fullyConnected(pre_class, 100, bias=0)
+    with tf.variable_scope('fc4'):
+        out = nh.fullyConnected(fc3, 1, rectifier=tf.nn.sigmoid, bias=0.0)
     return out
 
-def hook_generator(noise):
+def hook_generator(noise, old_screen, action):
+    with tf.variable_scope('os_proc_gen'):
+        processed_old_screen = process_old_screen_hook(old_screen)
+    with tf.variable_scope('action_proc_gen'):
+        processed_action = process_action_hook(action)
+    with tf.variable_scope('n_fc1'):
+        n_fc1 = nh.fullyConnected(noise, 100, bias=0)
+
+    combined = tf.concat(1, [n_fc1, processed_old_screen, processed_action])
+
     with tf.variable_scope('fc1'):
-        fc1 = nh.fullyConnected(noise, 128*7*7, bias=0.0)
+        fc1 = nh.fullyConnected(combined, 128*7*7, bias=0.0)
     fc1 = tf.reshape(fc1, [-1, 7, 7, 128])
     with tf.variable_scope('c1'):
         c1 = nh.upConvolution(fc1, 5, 128, 64, bias=0.0)
@@ -49,16 +83,19 @@ def hook_normal_discriminator(Z):
         out = nh.fullyConnected(fc2, 1, rectifier=tf.nn.sigmoid, bias=0)
     return out
 
-inp_data = tf.placeholder(tf.float32, [None, 28, 28, 3])
+inp_data = tf.placeholder(tf.float32, [None, 28, 28, 1])
 inp_noise = tf.placeholder(tf.float32, [None, 10])
+inp_old_screen = tf.placeholder(tf.float32, [None, 28, 28, 1])
+inp_action = tf.placeholder(tf.float32, [None, 4])
+
 
 with tf.variable_scope('generator'):
-    GZ = hook_generator(inp_noise)
+    GZ = hook_generator(inp_noise, inp_old_screen, inp_action)
 
 with tf.variable_scope('discriminator'):
-    DX = hook_discriminator(tf.reshape(inp_data, [-1, 28, 28, 3]))
+    DX = hook_discriminator(tf.reshape(inp_data, [-1, 28, 28, 1]), inp_old_screen, inp_action)
 with tf.variable_scope('discriminator', reuse=True):
-    DGZ = hook_discriminator(GZ)
+    DGZ = hook_discriminator(GZ, inp_old_screen, inp_action)
 
 
 discriminator_loss = -(tf.reduce_mean(tf.log(DX)) + tf.reduce_mean(tf.log(1 - DGZ)))
