@@ -19,7 +19,7 @@ def hook_discriminator(inp):
 
 def hook_generator(noise):
     with tf.variable_scope('fc1'):
-        fc1 = nh.fullyConnected(noise, 128*7*7, tf.nn.tanh, bias=0.0)
+        fc1 = nh.fullyConnected(noise, 128*7*7, bias=0.0)
     fc1 = tf.reshape(fc1, [-1, 7, 7, 128])
 
     #with tf.variable_scope('fc2'):
@@ -97,8 +97,8 @@ generator_loss = -tf.reduce_mean(tf.log(DGZ))
 learning_rate = 0.0001
 train_gen = tf.train.AdamOptimizer(learning_rate).minimize(generator_loss, var_list=nh.get_vars('generator'))
 train_discr = tf.train.AdamOptimizer(learning_rate).minimize(discriminator_loss, var_list=nh.get_vars('discriminator'))
-train_normal_discr = tf.train.AdamOptimizer(learning_rate/2).minimize(normal_discriminator_loss, var_list=nh.get_vars('normal_discr'))
-train_normal_gen = tf.train.AdamOptimizer(learning_rate/2).minimize(normal_gen_loss, var_list=nh.get_vars('normal_mapper'))
+train_normal_discr = tf.train.AdamOptimizer(learning_rate).minimize(normal_discriminator_loss, var_list=nh.get_vars('normal_discr'))
+train_normal_gen = tf.train.AdamOptimizer(learning_rate).minimize(normal_gen_loss, var_list=nh.get_vars('normal_mapper'))
 
 saver_gen = tf.train.Saver(var_list=nh.get_vars('generator'))
 saver_discr = tf.train.Saver(var_list=nh.get_vars('discriminator'))
