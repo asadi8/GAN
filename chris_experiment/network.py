@@ -4,7 +4,7 @@ import network_helpers as nh
 
 def hook_discriminator(inp):
     with tf.variable_scope('c1'):
-        c1 = nh.downConvolution(inp, 5, 1, 3*5, 128, conv_stride=2) # 14 x 14 x 32
+        c1 = nh.downConvolution(inp, 5, 1, 5, 128, conv_stride=2) # 14 x 14 x 32
     with tf.variable_scope('c2'):
         c2 = nh.downConvolution(c1, 5, 1, 128, 64, conv_stride=2) # 7 x 7 x 64
         c2 = tf.reshape(c2, [-1, 7*7*64])
@@ -69,7 +69,7 @@ with tf.variable_scope('generator'):
     GZ = hook_generator(inp_noise)
 
 with tf.variable_scope('discriminator'):
-    DX = hook_discriminator(tf.reshape(inp_data, [-1, 28, 28, 3*5]))
+    DX = hook_discriminator(tf.reshape(inp_data, [-1, 28, 28, 5]))
 with tf.variable_scope('discriminator', reuse=True):
     DGZ = hook_discriminator(GZ)
 
@@ -101,7 +101,7 @@ discriminator_loss = -(tf.reduce_mean(tf.log(DX)) + tf.reduce_mean(tf.log(1 - DG
 generator_loss = -tf.reduce_mean(tf.log(DGZ))
 
 
-learning_rate = 0.00005
+learning_rate = 0.0001
 train_gen = tf.train.AdamOptimizer(learning_rate).minimize(generator_loss, var_list=nh.get_vars('generator'))
 train_discr = tf.train.AdamOptimizer(learning_rate).minimize(discriminator_loss, var_list=nh.get_vars('discriminator'))
 '''train_normal_discr = tf.train.AdamOptimizer(learning_rate).minimize(normal_discriminator_loss, var_list=nh.get_vars('normal_discr'))
