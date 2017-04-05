@@ -7,6 +7,8 @@ def train_model(num_steps=-1, gen_name='generator', discr_name='discriminator', 
     if num_steps == -1:
         num_steps = np.inf
     i = 1
+    network.saver_gen.restore(network.sess, './'+gen_name+'.ckpt')
+    network.saver_discr.restore(network.sess, './'+discr_name+'.ckpt')
     while i < num_steps:
         gen_loss = '-'
         discr_loss = '-'
