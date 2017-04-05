@@ -89,7 +89,7 @@ with tf.variable_scope('discriminator', reuse=True):
 discriminator_loss = -(tf.reduce_mean(tf.log(DX)) + tf.reduce_mean(tf.log(1 - DGZ)))
 
 
-generator_loss = -tf.reduce_mean(tf.log(DGZ)) + tf.reduce_mean(tf.square(inp_data - GZ))
+generator_loss = -tf.reduce_mean(tf.log(DGZ)) + 10*tf.reduce_mean(tf.square(inp_data - GZ))
 
 
 learning_rate = 0.0001
