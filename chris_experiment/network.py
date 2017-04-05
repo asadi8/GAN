@@ -33,6 +33,28 @@ def hook_generator(noise):
         c2 = nh.upConvolution(c1, 5, 64, 3, rectifier=tf.nn.sigmoid, bias=0.0)
     return c2
 
+def hook_normal_mapper(X):
+    with tf.variable_scope('c1'):
+        c1 = nh.downConvolution(X, 5, 1, 3, 128, conv_stride=2) # 14 x 14 x 32
+    with tf.variable_scope('c2'):
+        c2 = nh.downConvolution(c1, 5, 1, 128, 64, conv_stride=2) # 7 x 7 x 64
+        c2 = tf.reshape(c2, [-1, 7*7*64])
+
+    with tf.variable_scope('fc1'):
+        fc1 = nh.fullyConnected(c2, 500, bias=0)
+    with tf.variable_scope('fc2'):
+        Z = nh.fullyConnected(fc1, 10, bias=0.0)
+    return Z
+
+def hook_normal_discriminator(Z):
+    with tf.variable_scope('fc1'):
+        fc1 = nh.fullyConnected(Z, 100, bias=0)
+    with tf.variable_scope('fc2'):
+        fc2 = nh.fullyConnected(fc1, 100, bias=0)
+    with tf.variable_scope('fc3'):
+        out = nh.fullyConnected(fc2, 1, rectifier=tf.nn.sigmoid, bias=0)
+    return out
+
 inp_data = tf.placeholder(tf.float32, [None, 28, 28, 3])
 inp_noise = tf.placeholder(tf.float32, [None, 10])
 
@@ -44,9 +66,26 @@ with tf.variable_scope('discriminator'):
 with tf.variable_scope('discriminator', reuse=True):
     DGZ = hook_discriminator(GZ)
 
+with tf.variable_scope('normal_mapper'):
+    EX = hook_normal_mapper(inp_data)
+with tf.variable_scope('normal_mapper', reuse=True):
+    EGZ = hook_normal_mapper(GZ)
+
+with tf.variable_scope('normal_discr'):
+    DZ = hook_normal_discriminator(inp_noise)
+with tf.variable_scope('normal_discr', reuse=True):
+    DEX = hook_normal_discriminator(EX)
+with tf.variable_scope('normal_discr', reuse=True):
+    DEGZ = hook_normal_discriminator(EGZ)
 
 
 
+
+
+normal_discriminator_loss = (-(tf.reduce_mean(tf.log(DZ)) + tf.reduce_mean(tf.log(1 - DEX)))
+                             -(tf.reduce_mean(tf.log(DZ)) + tf.reduce_mean(tf.log(1 - DEGZ))))
+
+normal_gen_loss = (-tf.reduce_mean(tf.log(DEX)) - tf.reduce_mean(tf.log(DEGZ)))
 
 
 discriminator_loss = -(tf.reduce_mean(tf.log(DX)) + tf.reduce_mean(tf.log(1 - DGZ)))
@@ -58,6 +97,8 @@ generator_loss = -tf.reduce_mean(tf.log(DGZ))
 learning_rate = 0.0001
 train_gen = tf.train.AdamOptimizer(learning_rate).minimize(generator_loss, var_list=nh.get_vars('generator'))
 train_discr = tf.train.AdamOptimizer(learning_rate).minimize(discriminator_loss, var_list=nh.get_vars('discriminator'))
+train_normal_discr = tf.train.AdamOptimizer(learning_rate).minimize(normal_discriminator_loss, var_list=nh.get_vars('normal_discr'))
+train_normal_gen = tf.train.AdamOptimizer(learning_rate).minimize(normal_gen_loss, var_list=nh.get_vars('normal_mapper'))
 
 saver_gen = tf.train.Saver(var_list=nh.get_vars('generator'))
 saver_discr = tf.train.Saver(var_list=nh.get_vars('discriminator'))

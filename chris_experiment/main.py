@@ -14,6 +14,15 @@ def train_model(num_steps=-1, gen_name='generator', discr_name='discriminator', 
         discr_loss = '-'
         data = bh.get_batch(32)
         noise = bh.get_noise(32, 10)
+
+        [_, normal_discr_loss] = network.sess.run([network.train_normal_discr, network.normal_discriminator_loss], feed_dict={network.inp_data: data,
+                                                               network.inp_noise: noise})
+
+        [_, normal_gen_loss] = network.sess.run([network.train_normal_gen, network.normal_gen_loss], feed_dict={
+            network.inp_data: data,
+            network.inp_noise: noise
+        })
+
         if i % 1 == 0:
             [_, discr_loss] = network.sess.run([network.train_discr, network.discriminator_loss], feed_dict={network.inp_data: data,
                                                                network.inp_noise: noise})
@@ -33,7 +42,7 @@ def train_model(num_steps=-1, gen_name='generator', discr_name='discriminator', 
             network.saver_discr.save(network.sess, './'+discr_name+'.ckpt')
             network.saver_gen.save(network.sess, './'+gen_name+'.ckpt')
 
-        print i, 'discr', discr_loss, 'gen', gen_loss
+        print i, 'norm_discr', normal_discr_loss, 'norm_gen', normal_gen_loss, 'discr', discr_loss, 'gen', gen_loss
         i += 1
 
 train_model()
