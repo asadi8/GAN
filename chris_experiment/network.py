@@ -19,7 +19,7 @@ def hook_generator(noise):
     with tf.variable_scope('fc1'):
         fc1 = nh.fullyConnected(noise, 100, bias=0.0)
     with tf.variable_scope('fc2'):
-        fc2 = nh.fullyConnected(fc1, 7*7*10, bias=0.0)
+        fc2 = nh.fullyConnected(fc1, 7*7*64, bias=0.0)
         fc2 = tf.reshape(fc2, [-1, 7, 7, 64])
     #c2 = nh.fullyConnected(fc2, 28*28, rectifier=tf.nn.sigmoid, bias=0)
     #c2 = tf.reshape(c2, [-1, 28, 28, 1])

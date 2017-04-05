@@ -16,3 +16,4 @@ def get_batch(batch_size):
 def get_noise(batch_size, noise_size):
     return np.random.normal(size=(batch_size, noise_size))
 
+print get_batch(32).shape
