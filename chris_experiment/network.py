@@ -43,7 +43,7 @@ def hook_normal_mapper(X):
     with tf.variable_scope('fc1'):
         fc1 = nh.fullyConnected(c2, 500, bias=0)
     with tf.variable_scope('fc2'):
-        Z = nh.fullyConnected(fc1, 10, bias=0.0)
+        Z = nh.fullyConnected(fc1, 10, rectifier=lambda x: x, bias=0.0)
     return Z
 
 def hook_normal_discriminator(Z):
