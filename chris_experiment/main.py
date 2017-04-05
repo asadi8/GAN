@@ -46,8 +46,8 @@ def train_action_model(num_steps=-1, gen_name='generator_action', discr_name='di
     if num_steps == -1:
         num_steps = np.inf
     i = 1
-    network.saver_gen.restore(network.sess, './'+gen_name+'.ckpt')
-    network.saver_discr.restore(network.sess, './'+discr_name+'.ckpt')
+    #network.saver_gen.restore(network.sess, './'+gen_name+'.ckpt')
+    #network.saver_discr.restore(network.sess, './'+discr_name+'.ckpt')
     while i < num_steps:
         gen_loss = '-'
         discr_loss = '-'
@@ -86,4 +86,4 @@ def train_action_model(num_steps=-1, gen_name='generator_action', discr_name='di
         i += 1
 
 
-train_model()
+train_action_model()
