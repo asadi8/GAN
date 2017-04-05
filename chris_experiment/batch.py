@@ -5,7 +5,7 @@ import os
 
 dataset_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '../gray')
 
-images = [cv2.imread(os.path.join(dataset_path, x)) for x in os.listdir(dataset_path)
+images = [cv2.imread(os.path.join(dataset_path, x))[:, :, [0]] for x in os.listdir(dataset_path)
           if x.endswith('.png')]
 images = np.array(images)
 
@@ -15,7 +15,7 @@ def get_batch(batch_size):
         indices = np.random.randint(0, len(images), size=5)
         print images.shape
         sub_batch = np.transpose(images[indices], [1, 2, 3, 0])
-        print sub_batch.shape 
+        print sub_batch.shape
         batch.append(sub_batch)
     return np.array(batch) / 255.
 
