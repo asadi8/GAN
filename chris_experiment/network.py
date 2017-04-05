@@ -69,7 +69,7 @@ with tf.variable_scope('generator'):
     GZ = hook_generator(inp_noise)
 
 with tf.variable_scope('discriminator'):
-    DX = hook_discriminator(inp_data)
+    DX = hook_discriminator(tf.reshape(inp_data, [-1, 28, 28, 3*5]))
 with tf.variable_scope('discriminator', reuse=True):
     DGZ = hook_discriminator(GZ)
 
