@@ -60,17 +60,29 @@ inp_noise = tf.placeholder(tf.float32, [None, 10])
 inp_old_screen = tf.placeholder(tf.float32, [None, 28, 28, 1])
 inp_action = tf.placeholder(tf.float32, [None, 4])
 
-with tf.variable_scope('proc_screen'):
+with tf.variable_scope('proc_screen_gen'):
     processed_old_screen = process_old_screen_hook(inp_old_screen)
-with tf.variable_scope('proc_action'):
-        processed_action = process_action_hook(inp_action)
+with tf.variable_scope('proc_action_gen'):
+    processed_action = process_action_hook(inp_action)
 
 with tf.variable_scope('generator'):
+    with tf.variable_scope('proc_screen'):
+        processed_old_screen = process_old_screen_hook(inp_old_screen)
+    with tf.variable_scope('proc_action'):
+        processed_action = process_action_hook(inp_action)
     GZ = hook_generator(inp_noise, processed_old_screen, processed_action)
 
 with tf.variable_scope('discriminator'):
+    with tf.variable_scope('proc_screen'):
+        processed_old_screen = process_old_screen_hook(inp_old_screen)
+    with tf.variable_scope('proc_action'):
+        processed_action = process_action_hook(inp_action)
     DX = hook_discriminator(tf.reshape(inp_data, [-1, 28, 28, 1]), processed_old_screen, processed_action)
 with tf.variable_scope('discriminator', reuse=True):
+    with tf.variable_scope('proc_screen'):
+        processed_old_screen = process_old_screen_hook(inp_old_screen)
+    with tf.variable_scope('proc_action'):
+        processed_action = process_action_hook(inp_action)
     DGZ = hook_discriminator(GZ, processed_old_screen, processed_action)
 
 
@@ -82,10 +94,10 @@ generator_loss = -tf.reduce_mean(tf.log(DGZ))
 
 
 learning_rate = 0.00005
-train_gen = tf.train.AdamOptimizer(learning_rate).minimize(generator_loss, var_list=nh.get_vars('generator')+nh.get_vars('proc_screen')+nh.get_vars('proc_action'))
-train_discr = tf.train.AdamOptimizer(learning_rate).minimize(discriminator_loss, var_list=nh.get_vars('discriminator')+nh.get_vars('proc_screen')+nh.get_vars('proc_action'))
+train_gen = tf.train.AdamOptimizer(learning_rate).minimize(generator_loss, var_list=nh.get_vars('generator'))
+train_discr = tf.train.AdamOptimizer(learning_rate).minimize(discriminator_loss, var_list=nh.get_vars('discriminator'))
 
-saver_gen = tf.train.Saver(var_list=nh.get_vars('generator')+nh.get_vars('proc_screen')+nh.get_vars('proc_action'))
+saver_gen = tf.train.Saver(var_list=nh.get_vars('generator'))
 saver_discr = tf.train.Saver(var_list=nh.get_vars('discriminator'))
 
 config = tf.ConfigProto(allow_soft_placement=True)
