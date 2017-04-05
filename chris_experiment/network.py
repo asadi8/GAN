@@ -12,10 +12,12 @@ def hook_discriminator(inp):
     with tf.variable_scope('fc1'):
         fc1 = nh.fullyConnected(c2, 500, rectifier=tf.nn.tanh, bias=0)
     with tf.variable_scope('fc2'):
-        fc2 = nh.fullyConnected(fc1, 100, bias=0.0)
+        fc2 = nh.fullyConnected(fc1, 10, bias=0.0)
+    with tf.variable_scope('fc3'):
+        fc3 = nh.fullyConnected(tf.reshape(fc2, [1, 10*32]), 100, bias=0)
     with tf.variable_scope('fc3'):
         out = nh.fullyConnected(fc2, 1, rectifier=tf.nn.sigmoid, bias=0.0)
-    return out
+    return tf.tile(out, [32, 1])
 
 def hook_generator(noise):
     with tf.variable_scope('fc1'):
@@ -44,8 +46,26 @@ with tf.variable_scope('discriminator'):
 with tf.variable_scope('discriminator', reuse=True):
     DGZ = hook_discriminator(GZ)
 
-generator_loss = -tf.reduce_mean(tf.log(DGZ))
+with tf.variable_scope('discriminator_notrain'):
+    DX = hook_discriminator(inp_data)
+with tf.variable_scope('discriminator_notrain', reuse=True):
+    DGZ = hook_discriminator(GZ)
+
+
+
+
+
 discriminator_loss = -(tf.reduce_mean(tf.log(DX)) + tf.reduce_mean(tf.log(1 - DGZ)))
+unroll = 5
+theta_D = nh.get_vars('discriminator')
+
+for i in range(unroll):
+    grad_theta_D = tf.gradients(discriminator_loss, theta_D)
+    theta_D = theta_D + 0.00005*grad_theta_D
+
+
+generator_loss = -tf.reduce_mean(tf.log(DGZ))
+
 
 learning_rate = 0.00005
 train_gen = tf.train.AdamOptimizer(learning_rate).minimize(generator_loss, var_list=nh.get_vars('generator'))
