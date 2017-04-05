@@ -29,7 +29,7 @@ def hook_generator(noise):
         c2 = nh.upConvolution(c1, 5, 32, 3, rectifier=tf.nn.sigmoid, bias=0.0)
     return c2
 
-inp_data = tf.placeholder(tf.float32, [None, 28, 28, 1])
+inp_data = tf.placeholder(tf.float32, [None, 28, 28, 3])
 inp_noise = tf.placeholder(tf.float32, [None, 100])
 
 with tf.variable_scope('generator'):
