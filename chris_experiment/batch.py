@@ -11,7 +11,7 @@ images = np.array(images)
 
 def get_batch(batch_size):
     indices = np.random.randint(0, len(images), size=batch_size)
-    return images[indices, :, :] / 255.
+    return images[indices, :, :, :] / 255.
 
 def get_noise(batch_size, noise_size):
     return np.random.normal(size=(batch_size, noise_size))
