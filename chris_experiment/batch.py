@@ -12,10 +12,10 @@ images = np.array(images)
 def get_batch(batch_size):
     batch = []
     for i in range(batch_size):
-        indices = np.random.randint(0, len(images), size=1)
+        indices = np.random.randint(0, len(images), size=3)
         sub_batch = np.transpose(images[indices], [1, 2, 3, 0])
         batch.append(sub_batch)
-    print np.array(batch).shape 
+    print np.array(batch).shape
     return np.reshape(np.array(batch) / 255., [batch_size, 28, 28, 3])
 
 def get_noise(batch_size, noise_size):
