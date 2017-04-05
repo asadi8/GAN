@@ -77,7 +77,7 @@ def train_action_model(num_steps=-1, gen_name='generator_action', discr_name='di
         if i % disp_interval == 0:
             for j in range(5):
                 ii = np.random.randint(0,3)
-                cv2.imwrite('./recent%s.png' % str(j), 255*gen_image[j][:, :, 0])
+                cv2.imwrite('./recent%s.png' % str(j), np.concatenate([255*gen_image[j][:, :, 0], 255*old_screens[j][:, :, 0]], axis=1))
         if i % save_interval == 0:
             network.saver_discr.save(network.sess, './'+discr_name+'.ckpt')
             network.saver_gen.save(network.sess, './'+gen_name+'.ckpt')
