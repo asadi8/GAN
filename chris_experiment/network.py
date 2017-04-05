@@ -55,7 +55,7 @@ def hook_normal_discriminator(Z):
         out = nh.fullyConnected(fc2, 1, rectifier=tf.nn.sigmoid, bias=0)
     return out
 
-inp_data = tf.placeholder(tf.float32, [None, 28, 28, 3])
+inp_data = tf.placeholder(tf.float32, [None, 28, 28, 3*5])
 inp_noise = tf.placeholder(tf.float32, [None, 10])
 
 with tf.variable_scope('generator'):
