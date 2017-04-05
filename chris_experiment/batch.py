@@ -18,7 +18,9 @@ def open_action_dataset():
         ep_path = os.path.join(action_dataset_path, ep)
         dirs = [x for x in os.listdir(ep_path) if x.endswith('.png')]
         ordered_dirs = sorted(dirs, key=lambda x: int(re.match(r'^\d+\_(\d+)\.png$', x).groups()[0]))
-        ordered_screens = np.array([cv2.imread(os.path.join(ep_path, d))[:, :, [0]] for d in ordered_dirs])
+        ordered_screens = np.array([np.reshape(np.sum(cv2.resize(cv2.imread(os.path.join(ep_path, d)), (28, 28)), axis=2)/3., [28, 28, 1])
+                                    for d in ordered_dirs])
+
         with open(os.path.join(ep_path, 'actions.txt'), 'r') as f:
             actions = np.array([eval(x) for x in f.readlines()])
         old_screens = ordered_screens[:-1]
