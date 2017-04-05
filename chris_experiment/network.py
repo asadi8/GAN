@@ -27,28 +27,6 @@ def hook_generator(noise):
         c2 = nh.upConvolution(c1, 5, 64, 3, rectifier=tf.nn.sigmoid, bias=0.0)
     return c2
 
-def hook_normal_mapper(X):
-    with tf.variable_scope('c1'):
-        c1 = nh.downConvolution(X, 5, 1, 3, 128, conv_stride=2) # 14 x 14 x 32
-    with tf.variable_scope('c2'):
-        c2 = nh.downConvolution(c1, 5, 1, 128, 64, conv_stride=2) # 7 x 7 x 64
-        c2 = tf.reshape(c2, [-1, 7*7*64])
-
-    with tf.variable_scope('fc1'):
-        fc1 = nh.fullyConnected(c2, 500, bias=0)
-    with tf.variable_scope('fc2'):
-        Z = nh.fullyConnected(fc1, 10, rectifier=lambda x: x, bias=0.0)
-    return Z
-
-def hook_normal_discriminator(Z):
-    with tf.variable_scope('fc1'):
-        fc1 = nh.fullyConnected(Z, 100, bias=0)
-    with tf.variable_scope('fc2'):
-        fc2 = nh.fullyConnected(fc1, 100, bias=0)
-    with tf.variable_scope('fc3'):
-        out = nh.fullyConnected(fc2, 1, rectifier=tf.nn.sigmoid, bias=0)
-    return out
-
 inp_data = tf.placeholder(tf.float32, [None, 28, 28, 3])
 inp_noise = tf.placeholder(tf.float32, [None, 10])
 
