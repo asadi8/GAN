@@ -13,7 +13,7 @@ def binarizer(x, num_bits, batch_size):
     return b + eps
 
 
-def leakyRelu(x, alpha=0.001):
+def leakyRelu(x, alpha=0.0001):
     return tf.maximum(alpha * x, x)
 
 def fullyConnected(inp_layer, numNeurons, rectifier=leakyRelu, bias=1.0):
