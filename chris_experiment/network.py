@@ -31,7 +31,7 @@ def hook_generator(noise):
         with tf.variable_scope('c1'):
             c1 = nh.upConvolution(fc1, 5, 128, 64, bias=0.0)
         with tf.variable_scope('c2'):
-            c2 = nh.upConvolution(c1, 5, 64, 3, rectifier=tf.nn.sigmoid, bias=0.0)
+            c2 = nh.upConvolution(c1, 5, 64, 1, rectifier=tf.nn.sigmoid, bias=0.0)
         return c2
     res = []
     for i in range(5):
@@ -63,7 +63,7 @@ def hook_normal_discriminator(Z):
     return out
 
 inp_data = tf.placeholder(tf.float32, [None, 28, 28, 3, 5])
-inp_noise = tf.placeholder(tf.float32, [None, 10, 5 ])
+inp_noise = tf.placeholder(tf.float32, [None, 10, 5])
 
 with tf.variable_scope('generator'):
     GZ = hook_generator(inp_noise)
