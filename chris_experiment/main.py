@@ -70,6 +70,8 @@ def train_action_model(num_steps=-1, gen_name='generator_action', discr_name='di
 
         if np.isnan(discr_loss) or np.isnan(gen_loss):
             print 'Got NAN... restoring.'
+            if i < save_interval:
+                break 
             network.saver_gen.restore(network.sess, './'+gen_name+'.ckpt')
             network.saver_discr.restore(network.sess, './'+discr_name+'.ckpt')
             continue

@@ -60,10 +60,6 @@ inp_noise = tf.placeholder(tf.float32, [None, 10])
 inp_old_screen = tf.placeholder(tf.float32, [None, 28, 28, 1])
 inp_action = tf.placeholder(tf.float32, [None, 4])
 
-with tf.variable_scope('proc_screen_gen'):
-    processed_old_screen = process_old_screen_hook(inp_old_screen)
-with tf.variable_scope('proc_action_gen'):
-    processed_action = process_action_hook(inp_action)
 
 with tf.variable_scope('generator'):
     with tf.variable_scope('proc_screen'):
