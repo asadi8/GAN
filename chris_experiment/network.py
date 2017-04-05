@@ -46,23 +46,23 @@ with tf.variable_scope('discriminator'):
 with tf.variable_scope('discriminator', reuse=True):
     DGZ = hook_discriminator(GZ)
 
-with tf.variable_scope('discriminator_notrain'):
+'''with tf.variable_scope('discriminator_notrain'):
     DX = hook_discriminator(inp_data)
 with tf.variable_scope('discriminator_notrain', reuse=True):
     DGZ = hook_discriminator(GZ)
-
+'''
 
 
 
 
 discriminator_loss = -(tf.reduce_mean(tf.log(DX)) + tf.reduce_mean(tf.log(1 - DGZ)))
-unroll = 5
+'''unroll = 5
 theta_D = nh.get_vars('discriminator')
 
 for i in range(unroll):
     grad_theta_D = tf.gradients(discriminator_loss, theta_D)
     theta_D = theta_D + 0.00005*grad_theta_D
-
+'''
 
 generator_loss = -tf.reduce_mean(tf.log(DGZ))
 
