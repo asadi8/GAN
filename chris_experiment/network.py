@@ -14,7 +14,7 @@ def hook_discriminator(inp):
     with tf.variable_scope('fc2'):
         fc2 = nh.fullyConnected(fc1, 100, bias=0.0)
     with tf.variable_scope('fc3'):
-        out = (nh.fullyConnected(fc2, 1, rectifier=tf.nn.tanh, bias=0.0) + 1)/2.0
+        out = nh.fullyConnected(fc2, 1, rectifier=tf.nn.sigmoid, bias=0.0)
     return out
 
 def hook_generator(noise):
