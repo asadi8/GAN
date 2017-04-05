@@ -78,14 +78,14 @@ discriminator_loss = -(tf.reduce_mean(tf.log(DX)) + tf.reduce_mean(tf.log(1 - DG
 
 modified_discr_loss = discriminator_loss
 
-generator_loss = -tf.reduce_mean(tf.log(DGZ)) + tf.reduce_mean(tf.square(GZ - inp_data))
+generator_loss = -tf.reduce_mean(tf.log(DGZ))
 
 
 learning_rate = 0.00005
-train_gen = tf.train.AdamOptimizer(learning_rate).minimize(generator_loss, var_list=nh.get_vars('generator'))
-train_discr = tf.train.AdamOptimizer(learning_rate).minimize(discriminator_loss, var_list=nh.get_vars('discriminator'))
+train_gen = tf.train.AdamOptimizer(learning_rate).minimize(generator_loss, var_list=nh.get_vars('generator')+nh.get_vars('proc_screen')+nh.get_vars('proc_action'))
+train_discr = tf.train.AdamOptimizer(learning_rate).minimize(discriminator_loss, var_list=nh.get_vars('discriminator')+nh.get_vars('proc_screen')+nh.get_vars('proc_action'))
 
-saver_gen = tf.train.Saver(var_list=nh.get_vars('generator'))
+saver_gen = tf.train.Saver(var_list=nh.get_vars('generator')+nh.get_vars('proc_screen')+nh.get_vars('proc_action'))
 saver_discr = tf.train.Saver(var_list=nh.get_vars('discriminator'))
 
 config = tf.ConfigProto(allow_soft_placement=True)
