@@ -35,7 +35,7 @@ def hook_generator(noise):
         return c2
     res = []
     for i in range(5):
-        with tf.variable_scope('sub_generator', reuse=i>0):
+        with tf.variable_scope('sub_generator'+str(i)):
             res.append(sub_generator(noise[:, :, i]))
     c2 = tf.concat(3, res)
     return c2
