@@ -7,8 +7,8 @@ def train_model(num_steps=-1, gen_name='generator', discr_name='discriminator', 
     if num_steps == -1:
         num_steps = np.inf
     i = 1
-    #network.saver_gen.restore(network.sess, './'+gen_name+'.ckpt')
-    #network.saver_discr.restore(network.sess, './'+discr_name+'.ckpt')
+    network.saver_gen.restore(network.sess, './'+gen_name+'.ckpt')
+    network.saver_discr.restore(network.sess, './'+discr_name+'.ckpt')
     while i < num_steps:
         gen_loss = '-'
         discr_loss = '-'
@@ -27,7 +27,8 @@ def train_model(num_steps=-1, gen_name='generator', discr_name='discriminator', 
             break
 
         if i % disp_interval == 0:
-            cv2.imwrite('./recent.png', 255*gen_image[0])
+            for j in range(5):
+                cv2.imwrite('./recent%s.png' % str(j), 255*gen_image[j])
         if i % save_interval == 0:
             network.saver_discr.save(network.sess, './'+discr_name+'.ckpt')
             network.saver_gen.save(network.sess, './'+gen_name+'.ckpt')
