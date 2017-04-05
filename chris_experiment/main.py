@@ -24,7 +24,7 @@ def train_model(num_steps=-1, gen_name='generator', discr_name='discriminator', 
         })
 
         if np.isnan(discr_loss) or np.isnan(gen_loss):
-            break 
+            break
 
         if i % disp_interval == 0:
             cv2.imwrite('./recent.png', 255*gen_image[0])
