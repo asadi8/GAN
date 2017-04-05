@@ -20,10 +20,10 @@ def process_action_hook(action):
         fc2 = nh.fullyConnected(fc1, 100, bias=0)
     return fc2
 
-def hook_discriminator(inp, old_screen, action):
-    with tf.variable_scope('os_proc_gen'):
+def hook_discriminator(inp, old_screen, action, reuse_proc=None):
+    with tf.variable_scope('os_proc', reuse=reuse_proc):
         processed_old_screen = process_old_screen_hook(old_screen)
-    with tf.variable_scope('action_proc_gen'):
+    with tf.variable_scope('action_proc', reuse=reuse_proc):
         processed_action = process_action_hook(action)
     with tf.variable_scope('c1'):
         c1 = nh.downConvolution(inp, 5, 1, 1, 128, conv_stride=2) # 14 x 14 x 32
@@ -42,10 +42,10 @@ def hook_discriminator(inp, old_screen, action):
         out = nh.fullyConnected(fc3, 1, rectifier=tf.nn.sigmoid, bias=0.0)
     return out
 
-def hook_generator(noise, old_screen, action):
-    with tf.variable_scope('os_proc_gen'):
+def hook_generator(noise, old_screen, action, reuse_proc=None):
+    with tf.variable_scope('proc_gen', reuse=reuse_proc):
         processed_old_screen = process_old_screen_hook(old_screen)
-    with tf.variable_scope('action_proc_gen'):
+    with tf.variable_scope('proc_gen', reuse=reuse_proc):
         processed_action = process_action_hook(action)
     with tf.variable_scope('n_fc1'):
         n_fc1 = nh.fullyConnected(noise, 100, bias=0)
@@ -71,9 +71,9 @@ with tf.variable_scope('generator'):
     GZ = hook_generator(inp_noise, inp_old_screen, inp_action)
 
 with tf.variable_scope('discriminator'):
-    DX = hook_discriminator(tf.reshape(inp_data, [-1, 28, 28, 1]), inp_old_screen, inp_action)
+    DX = hook_discriminator(tf.reshape(inp_data, [-1, 28, 28, 1]), inp_old_screen, inp_action, reuse_proc=True)
 with tf.variable_scope('discriminator', reuse=True):
-    DGZ = hook_discriminator(GZ, inp_old_screen, inp_action)
+    DGZ = hook_discriminator(GZ, inp_old_screen, inp_action, reuse_proc=True)
 
 
 discriminator_loss = -(tf.reduce_mean(tf.log(DX)) + tf.reduce_mean(tf.log(1 - DGZ)))
