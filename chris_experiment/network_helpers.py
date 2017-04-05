@@ -72,7 +72,7 @@ def upConvolution(inp_layer, filter_size, filter_in, filter_out, rectifier=leaky
     #c2 = leakyRelu(tf.nn.conv2d(c1, w2, [1, 1, 1, 1], 'SAME') + b2)
     return c1
 
-def downConvolution(inp_layer, filter_size, pool_size, filter_in, filter_out, conv_stride=1, pool_stride=None, pool=True):
+def downConvolution(inp_layer, filter_size, pool_size, filter_in, filter_out, rectifier=leakyRelu, conv_stride=1, pool_stride=None, pool=True):
     if not pool_stride:
         pool_stride = pool_size
         
@@ -81,7 +81,7 @@ def downConvolution(inp_layer, filter_size, pool_size, filter_in, filter_out, co
                          initializer=tf.contrib.layers.xavier_initializer())
     b1 = tf.get_variable('b1', shape=[filter_out], initializer=tf.constant_initializer(0.1))
     #c1 = tf.nn.relu(tf.nn.conv2d(inp_layer, w1, [1, 1, 1, 1], 'SAME') + b1)
-    c1 = leakyRelu(tf.nn.conv2d(inp_layer, w1, [1, conv_stride, conv_stride, 1], 'SAME') + b1)
+    c1 = rectifier(tf.nn.conv2d(inp_layer, w1, [1, conv_stride, conv_stride, 1], 'SAME') + b1)
     p1 = c1
     if pool:
         p1 = tf.nn.max_pool(c1, [1, pool_size, pool_size, 1], [1, pool_stride, pool_stride, 1], 'SAME')
