@@ -21,10 +21,7 @@ def process_action_hook(action):
     return fc2
 
 def hook_discriminator(inp, processed_old_screen, processed_action):
-    with tf.variable_scope('proc_screen', reuse=reuse_proc):
-        processed_old_screen = process_old_screen_hook(old_screen)
-    with tf.variable_scope('proc_action', reuse=reuse_proc):
-        processed_action = process_action_hook(action)
+
     with tf.variable_scope('c1'):
         c1 = nh.downConvolution(inp, 5, 1, 1, 128, conv_stride=2) # 14 x 14 x 32
     with tf.variable_scope('c2'):
@@ -43,10 +40,7 @@ def hook_discriminator(inp, processed_old_screen, processed_action):
     return out
 
 def hook_generator(noise, processed_old_screen, processed_action):
-    with tf.variable_scope('proc_screen', reuse=reuse_proc):
-        processed_old_screen = process_old_screen_hook(old_screen)
-    with tf.variable_scope('proc_action', reuse=reuse_proc):
-        processed_action = process_action_hook(action)
+    
     with tf.variable_scope('n_fc1'):
         n_fc1 = nh.fullyConnected(noise, 100, bias=0)
 
