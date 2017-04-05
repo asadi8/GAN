@@ -40,7 +40,7 @@ def hook_discriminator(inp, processed_old_screen, processed_action):
     return out
 
 def hook_generator(noise, processed_old_screen, processed_action):
-    
+
     with tf.variable_scope('n_fc1'):
         n_fc1 = nh.fullyConnected(noise, 100, bias=0)
 
@@ -76,8 +76,9 @@ with tf.variable_scope('discriminator', reuse=True):
 
 discriminator_loss = -(tf.reduce_mean(tf.log(DX)) + tf.reduce_mean(tf.log(1 - DGZ)))
 
+modified_discr_loss = discriminator_loss
 
-generator_loss = -tf.reduce_mean(tf.log(DGZ))
+generator_loss = -tf.reduce_mean(tf.log(DGZ)) + tf.reduce_mean(tf.square(GZ - inp_data))
 
 
 learning_rate = 0.00005
