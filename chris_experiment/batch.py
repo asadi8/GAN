@@ -14,7 +14,8 @@ def get_batch(batch_size):
     for i in range(batch_size):
         indices = np.random.randint(0, len(images), size=5)
         print images.shape
-        sub_batch = np.transpose(images[indices, :, :, [0]], [1, 2, 3, 0])
+        sub_batch = np.transpose(images[indices], [1, 2, 3, 0])
+        print sub_batch.shape 
         batch.append(sub_batch)
     return np.array(batch) / 255.
 
