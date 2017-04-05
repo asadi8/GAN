@@ -33,7 +33,10 @@ def train_model(num_steps=-1, gen_name='generator', discr_name='discriminator', 
         })
 
         if np.isnan(discr_loss) or np.isnan(gen_loss):
-            break
+            print 'Got NAN... restoring.'
+            network.saver_gen.restore(network.sess, './'+gen_name+'.ckpt')
+            network.saver_discr.restore(network.sess, './'+discr_name+'.ckpt')
+            continue
 
         if i % disp_interval == 0:
             for j in range(5):
