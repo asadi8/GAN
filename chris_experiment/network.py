@@ -4,9 +4,9 @@ import network_helpers as nh
 
 def hook_discriminator(inp):
     with tf.variable_scope('c1'):
-        c1 = nh.downConvolution(inp, 5, 1, 3, 32, conv_stride=2) # 14 x 14 x 32
+        c1 = nh.downConvolution(inp, 5, 1, 3, 128, conv_stride=2) # 14 x 14 x 32
     with tf.variable_scope('c2'):
-        c2 = nh.downConvolution(c1, 5, 1, 32, 64, conv_stride=2) # 7 x 7 x 64
+        c2 = nh.downConvolution(c1, 5, 1, 128, 64, conv_stride=2) # 7 x 7 x 64
         c2 = tf.reshape(c2, [-1, 7*7*64])
 
     with tf.variable_scope('fc1'):
