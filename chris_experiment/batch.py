@@ -15,9 +15,9 @@ def get_batch(batch_size):
         indices = np.random.randint(0, len(images), size=5)
         sub_batch = np.transpose(images[indices], [1, 2, 3, 0])
         batch.append(sub_batch)
-    return np.array(batch) / 255.
+    return np.reshape(np.array(batch) / 255., [batch_size, 28, 28, 3])
 
 def get_noise(batch_size, noise_size):
-    return np.random.normal(size=(batch_size, noise_size, 5))
+    return np.random.normal(size=(batch_size, noise_size))
 
 print get_batch(32).shape
