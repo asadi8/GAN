@@ -4,7 +4,7 @@ import network_helpers as nh
 
 def hook_discriminator(inp):
     with tf.variable_scope('c1'):
-        c1 = nh.downConvolution(inp, 5, 1, 1, 5, conv_stride=2) # 14 x 14 x 32
+        c1 = nh.downConvolution(inp, 5, 1, 3, 5, conv_stride=2) # 14 x 14 x 32
     with tf.variable_scope('c2'):
         c2 = nh.downConvolution(c1, 5, 1, 5, 10, conv_stride=2) # 7 x 7 x 64
         c2 = tf.reshape(c2, [-1, 7*7*10])
@@ -20,13 +20,13 @@ def hook_generator(noise):
         fc1 = nh.fullyConnected(noise, 100, bias=0.0)
     with tf.variable_scope('fc2'):
         fc2 = nh.fullyConnected(fc1, 7*7*10, bias=0.0)
-        fc2 = tf.reshape(fc2, [-1, 7, 7, 10])
+        fc2 = tf.reshape(fc2, [-1, 7, 7, 64])
     #c2 = nh.fullyConnected(fc2, 28*28, rectifier=tf.nn.sigmoid, bias=0)
     #c2 = tf.reshape(c2, [-1, 28, 28, 1])
     with tf.variable_scope('c1'):
-        c1 = nh.upConvolution(fc2, 5, 10, 5, bias=0.0)
+        c1 = nh.upConvolution(fc2, 5, 64, 32, bias=0.0)
     with tf.variable_scope('c2'):
-        c2 = nh.upConvolution(c1, 5, 5, 1, rectifier=tf.nn.sigmoid, bias=0.0)
+        c2 = nh.upConvolution(c1, 5, 32, 3, rectifier=tf.nn.sigmoid, bias=0.0)
     return c2
 
 inp_data = tf.placeholder(tf.float32, [None, 28, 28, 1])
