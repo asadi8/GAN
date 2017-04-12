@@ -78,7 +78,7 @@ new_k = tf.clip_by_value(inp_k + inp_lambda*(0.5*LX - LGZ), 0, 1)
 #generator_loss = -tf.reduce_mean(tf.log(DGZ))
 
 
-learning_rate = 0.00001
+learning_rate = 0.0001
 train_gen = tf.train.AdamOptimizer(learning_rate).minimize(generator_loss, var_list=nh.get_vars('generator'))
 train_discr = tf.train.AdamOptimizer(learning_rate).minimize(discriminator_loss, var_list=nh.get_vars('discriminator'))
 
