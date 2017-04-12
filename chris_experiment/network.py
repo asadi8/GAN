@@ -67,12 +67,11 @@ def L(x, xhat):
 LX = L(inp_data, DX)
 LGZ = L(GZ, DGZ)
 
-gamma = tf.reduce_mean(LGZ) / tf.reduce_mean(LX)
 
 discriminator_loss =  tf.reduce_mean(LX - inp_k * LGZ)
 generator_loss = tf.reduce_mean(LGZ)
 loss = discriminator_loss + generator_loss
-new_k = inp_k + inp_lambda*(gamma*LX - LGZ)
+new_k = inp_k + inp_lambda*(0.5*LX - LGZ)
 #discriminator_loss = -(tf.reduce_mean(tf.log(DX)) + tf.reduce_mean(tf.log(1 - DGZ)))
 
 
