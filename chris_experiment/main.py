@@ -29,6 +29,7 @@ def train_model(num_steps=-1, gen_name='generator', discr_name='discriminator', 
             network.inp_k: k
         })
         k = new_k
+        print 'k', k 
 
         if np.isnan(discr_loss) or np.isnan(gen_loss):
             print 'Got NAN... restoring.'
