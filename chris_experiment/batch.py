@@ -34,7 +34,7 @@ def get_batch(batch_size):
     batch = []
     indices = np.random.randint(0, len(images), batch_size)
     batch = np.reshape(images[indices], [batch_size, 28, 28, 1])
-    return batch 
+    return batch
     #for i in range(batch_size):
         #indices = np.random.randint(0, len(images), size=3)
         #sub_batch = np.transpose(images[indices], [1, 2, 3, 0])
