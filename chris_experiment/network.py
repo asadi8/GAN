@@ -71,7 +71,7 @@ LGZ = L(GZ, DGZ)
 discriminator_loss =  LX - inp_k * LGZ
 generator_loss = LGZ
 loss = discriminator_loss + generator_loss
-new_k = inp_k + inp_lambda*(0.5*LX - LGZ)
+new_k = tf.clip_by_value(inp_k + inp_lambda*(0.5*LX - LGZ), 0, 1)
 #discriminator_loss = -(tf.reduce_mean(tf.log(DX)) + tf.reduce_mean(tf.log(1 - DGZ)))
 
 
