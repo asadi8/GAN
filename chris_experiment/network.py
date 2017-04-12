@@ -62,9 +62,11 @@ with tf.variable_scope('generator'):
     GZ = hook_generator(inp_noise)
 
 with tf.variable_scope('discriminator'):
-    DGZ = discriminator_autoencoder(None, specified_encoding=GZ)
-with tf.variable_scope('discriminator', reuse=True):
     DX = discriminator_autoencoder(inp_data)
+
+with tf.variable_scope('discriminator', reuse=True):
+    DGZ = discriminator_autoencoder(None, specified_encoding=GZ)
+
 
 #with tf.variable_scope('discriminator'):
 #    DX = hook_discriminator(tf.reshape(inp_data, [-1, 28, 28, 3]))
