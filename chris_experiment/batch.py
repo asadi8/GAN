@@ -32,7 +32,7 @@ action_dataset = open_action_dataset()
 
 def get_batch(batch_size):
     batch = []
-    indices = np.random.randint(0, len(images), batch_size)
+    indices = np.random.randint(0, len(images), size=batch_size)
     batch = np.reshape(images[indices], [batch_size, 28, 28, 1])
     return batch / 255.
     #for i in range(batch_size):

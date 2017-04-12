@@ -62,7 +62,7 @@ with tf.variable_scope('discriminator', reuse=True):
 #    DGZ = hook_discriminator(GZ)
 
 def L(x, xhat):
-    return tf.reduce_mean(tf.square(x - xhat))
+    return tf.reduce_sum(tf.abs(x - xhat))
 
 LX = L(inp_data, DX)
 LGZ = L(GZ, DGZ)
