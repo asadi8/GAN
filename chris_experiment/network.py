@@ -25,7 +25,7 @@ def discriminator_autoencoder(inp, specified_encoding=None):
             c2 = nh.downConvolution(c1, 5, 1, 32, 64, conv_stride=2) # 7 x 7 x 64
             c2 = tf.reshape(c2, [-1, 7*7*64])
         with tf.variable_scope('fc1'):
-            fc1 = nh.fullyConnected(c2, 100, bias=0, rectifier=lambda x: x)
+            fc1 = nh.fullyConnected(c2, 100, bias=0, rectifier=tf.nn.tanh)
     else:
         fc1 = specified_encoding
     with tf.variable_scope('fc2'):
@@ -43,7 +43,7 @@ def hook_generator(noise):
     with tf.variable_scope('fc2'):
         fc2 = nh.fullyConnected(fc1, 100, bias=0)
     with tf.variable_scope('fc3'):
-        return nh.fullyConnected(fc2, 100, bias=0, rectifier=lambda x: x)
+        return nh.fullyConnected(fc2, 100, bias=0, rectifier=tf.nn.tanh)
     #with tf.variable_scope('fc1'):
     #    fc1 = nh.fullyConnected(noise, 64*7*7, bias=0.0)
     #fc1 = tf.reshape(fc1, [-1, 7, 7, 64])
