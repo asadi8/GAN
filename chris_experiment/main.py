@@ -7,8 +7,9 @@ def train_model(num_steps=-1, gen_name='generator', discr_name='discriminator', 
     if num_steps == -1:
         num_steps = np.inf
     i = 1
-    network.saver_gen.restore(network.sess, './'+gen_name+'.ckpt')
-    network.saver_discr.restore(network.sess, './'+discr_name+'.ckpt')
+    #network.saver_gen.restore(network.sess, './'+gen_name+'.ckpt')
+    #network.saver_discr.restore(network.sess, './'+discr_name+'.ckpt')
+    k = 0.0
     while i < num_steps:
         gen_loss = '-'
         discr_loss = '-'
@@ -16,13 +17,18 @@ def train_model(num_steps=-1, gen_name='generator', discr_name='discriminator', 
         noise = bh.get_noise(32, 10)
 
         if i % 1 == 0:
-            [_, discr_loss] = network.sess.run([network.train_discr, network.discriminator_loss], feed_dict={network.inp_data: data,
-                                                               network.inp_noise: noise})
+            [_, discr_loss] = network.sess.run([network.train_discr, network.discriminator_loss], feed_dict=
+                {network.inp_data: data,
+                 network.inp_noise: noise,
+                 network.inp_k: k})
 
-        [_, gen_loss, gen_image] = network.sess.run([network.train_gen, network.generator_loss, network.GZ], feed_dict={
+
+        [_, gen_loss, gen_image, new_k] = network.sess.run([network.train_gen, network.generator_loss, network.GZ, network.new_k], feed_dict={
             network.inp_data: data,
-            network.inp_noise: noise
+            network.inp_noise: noise,
+            network.inp_k: k 
         })
+        k = new_k
 
         if np.isnan(discr_loss) or np.isnan(gen_loss):
             print 'Got NAN... restoring.'
@@ -88,4 +94,5 @@ def train_action_model(num_steps=-1, gen_name='generator_action', discr_name='di
         i += 1
 
 
-train_action_model()
+#train_action_model()
+train_model()

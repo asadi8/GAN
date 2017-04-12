@@ -17,6 +17,23 @@ def hook_discriminator(inp):
         out = nh.fullyConnected(fc2, 1, rectifier=tf.nn.sigmoid, bias=0.0)
     return out
 
+def discriminator_autoencoder(inp):
+    with tf.variable_scope('c1'):
+        c1 = nh.downConvolution(inp, 5, 1, 3, 128, conv_stride=2) # 14 x 14 x 32
+    with tf.variable_scope('c2'):
+        c2 = nh.downConvolution(c1, 5, 1, 128, 64, conv_stride=2) # 7 x 7 x 64
+        c2 = tf.reshape(c2, [-1, 7*7*64])
+    with tf.variable_scope('fc1'):
+        fc1 = nh.fullyConnected(c2, 100, bias=0)
+    with tf.variable_scope('fc2'):
+        fc2 = nh.fullyConnected(fc1, 128*7*7, bias=0.0)
+    fc2 = tf.reshape(fc2, [-1, 7, 7, 128])
+    with tf.variable_scope('dc1'):
+        c1 = nh.upConvolution(fc2, 5, 128, 64, bias=0.0)
+    with tf.variable_scope('dc2'):
+        c2 = nh.upConvolution(c1, 5, 64, 3, rectifier=tf.nn.sigmoid, bias=0.0)
+    return c2
+
 def hook_generator(noise):
     with tf.variable_scope('fc1'):
         fc1 = nh.fullyConnected(noise, 128*7*7, bias=0.0)
@@ -29,20 +46,36 @@ def hook_generator(noise):
 
 inp_data = tf.placeholder(tf.float32, [None, 28, 28, 3])
 inp_noise = tf.placeholder(tf.float32, [None, 10])
-
+inp_k = tf.placeholder(tf.float32)
+inp_lambda = 0.001
 with tf.variable_scope('generator'):
     GZ = hook_generator(inp_noise)
 
 with tf.variable_scope('discriminator'):
-    DX = hook_discriminator(tf.reshape(inp_data, [-1, 28, 28, 3]))
+    DGZ = discriminator_autoencoder(GZ)
 with tf.variable_scope('discriminator', reuse=True):
-    DGZ = hook_discriminator(GZ)
+    DX = discriminator_autoencoder(inp_data)
+
+#with tf.variable_scope('discriminator'):
+#    DX = hook_discriminator(tf.reshape(inp_data, [-1, 28, 28, 3]))
+#with tf.variable_scope('discriminator', reuse=True):
+#    DGZ = hook_discriminator(GZ)
+
+def L(x, xhat):
+    return tf.reduce_mean(tf.square(x - xhat))
+
+LX = L(inp_data, DX)
+LGZ = L(GZ, DGZ)
+
+gamma = LGZ / LX
+
+discriminator_loss =  LX - inp_k * LGZ
+generator_loss = LGZ
+new_k = inp_k + inp_lambda*(gamma*LX - LGZ)
+#discriminator_loss = -(tf.reduce_mean(tf.log(DX)) + tf.reduce_mean(tf.log(1 - DGZ)))
 
 
-discriminator_loss = -(tf.reduce_mean(tf.log(DX)) + tf.reduce_mean(tf.log(1 - DGZ)))
-
-
-generator_loss = -tf.reduce_mean(tf.log(DGZ))
+#generator_loss = -tf.reduce_mean(tf.log(DGZ))
 
 
 learning_rate = 0.00005
