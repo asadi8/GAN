@@ -48,6 +48,7 @@ inp_data = tf.placeholder(tf.float32, [None, 28, 28, 1])
 inp_noise = tf.placeholder(tf.float32, [None, 10])
 inp_k = tf.placeholder(tf.float32)
 inp_lambda = 0.001
+gamma = 0.1
 with tf.variable_scope('generator'):
     GZ = hook_generator(inp_noise)
 
@@ -71,14 +72,14 @@ LGZ = L(GZ, DGZ)
 discriminator_loss =  LX - inp_k * LGZ
 generator_loss = LGZ
 loss = discriminator_loss + generator_loss
-new_k = tf.clip_by_value(inp_k + inp_lambda*(0.5*LX - LGZ), 0, 1)
+new_k = tf.clip_by_value(inp_k + inp_lambda*(gamma*LX - LGZ), 0, 1)
 #discriminator_loss = -(tf.reduce_mean(tf.log(DX)) + tf.reduce_mean(tf.log(1 - DGZ)))
 
 
 #generator_loss = -tf.reduce_mean(tf.log(DGZ))
 
 
-learning_rate = 0.00001
+learning_rate = 0.0001
 train_gen = tf.train.AdamOptimizer(learning_rate).minimize(generator_loss, var_list=nh.get_vars('generator'))
 train_discr = tf.train.AdamOptimizer(learning_rate).minimize(discriminator_loss, var_list=nh.get_vars('discriminator'))
 
