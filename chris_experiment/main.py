@@ -1,7 +1,7 @@
 import batch as bh
 import numpy as np
 import cv2
-
+print 'moop'
 def train_model(num_steps=-1, gen_name='generator', discr_name='discriminator', disp_interval=100, save_interval=10000):
     import network
     if num_steps == -1:
@@ -26,7 +26,7 @@ def train_model(num_steps=-1, gen_name='generator', discr_name='discriminator', 
         [_, gen_loss, gen_image, new_k] = network.sess.run([network.train_gen, network.generator_loss, network.GZ, network.new_k], feed_dict={
             network.inp_data: data,
             network.inp_noise: noise,
-            network.inp_k: k 
+            network.inp_k: k
         })
         k = new_k
 
