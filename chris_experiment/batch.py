@@ -32,11 +32,14 @@ action_dataset = open_action_dataset()
 
 def get_batch(batch_size):
     batch = []
-    for i in range(batch_size):
-        indices = np.random.randint(0, len(images), size=3)
-        sub_batch = np.transpose(images[indices], [1, 2, 3, 0])
-        batch.append(sub_batch)
-    return np.reshape(np.array(batch) / 255., [batch_size, 28, 28, 3])
+    indices = np.random.randint(0, len(images), batch_size)
+    batch = np.reshape(images[indices], [batch_size, 28, 28, 1])
+    return batch 
+    #for i in range(batch_size):
+        #indices = np.random.randint(0, len(images), size=3)
+        #sub_batch = np.transpose(images[indices], [1, 2, 3, 0])
+        #batch.append(sub_batch)
+    #return np.reshape(np.array(batch) / 255., [batch_size, 28, 28, 3])
 
 def get_action_batch(batch_size):
     old_screens = []
