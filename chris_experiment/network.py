@@ -62,14 +62,14 @@ with tf.variable_scope('discriminator', reuse=True):
 #    DGZ = hook_discriminator(GZ)
 
 def L(x, xhat):
-    return tf.reduce_sum(tf.abs(x - xhat), reduction_indices=[1,2,3])
+    return tf.reduce_mean(tf.abs(x - xhat))
 
 LX = L(inp_data, DX)
 LGZ = L(GZ, DGZ)
 
 
-discriminator_loss =  tf.reduce_mean(LX - inp_k * LGZ)
-generator_loss = tf.reduce_mean(LGZ)
+discriminator_loss =  LX - inp_k * LGZ
+generator_loss = LGZ
 loss = discriminator_loss + generator_loss
 new_k = inp_k + inp_lambda*(0.5*LX - LGZ)
 #discriminator_loss = -(tf.reduce_mean(tf.log(DX)) + tf.reduce_mean(tf.log(1 - DGZ)))
