@@ -39,7 +39,7 @@ def train_model(num_steps=-1, gen_name='generator', discr_name='discriminator', 
         if i % disp_interval == 0:
             for j in range(5):
                 ii = np.random.randint(0,3)
-                cv2.imwrite('./recent%s.png' % str(j), 255*gen_image[j][:, :, ii])
+                cv2.imwrite('./recent%s.png' % str(j), 255*gen_image[j][:, :, 0])
         if i % save_interval == 0:
             network.saver_discr.save(network.sess, './'+discr_name+'.ckpt')
             network.saver_gen.save(network.sess, './'+gen_name+'.ckpt')
