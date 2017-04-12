@@ -35,7 +35,7 @@ def discriminator_autoencoder(inp, specified_encoding=None):
         c1 = nh.upConvolution(fc2, 5, 64, 32, bias=0.0)
     with tf.variable_scope('dc2'):
         c2 = nh.upConvolution(c1, 5, 32, 1, rectifier=tf.nn.sigmoid, bias=0.0)
-    return c2
+    return fc1, c2
 
 def hook_generator(noise):
     with tf.variable_scope('fc1'):
@@ -62,10 +62,10 @@ with tf.variable_scope('generator'):
     GZ = hook_generator(inp_noise)
 
 with tf.variable_scope('discriminator'):
-    DX = discriminator_autoencoder(inp_data)
+    enc, DX = discriminator_autoencoder(inp_data)
 
 with tf.variable_scope('discriminator', reuse=True):
-    DGZ = discriminator_autoencoder(None, specified_encoding=GZ)
+    encGZ, DGZ = discriminator_autoencoder(None, specified_encoding=GZ)
 
 
 #with tf.variable_scope('discriminator'):
@@ -77,7 +77,7 @@ def L(x, xhat):
     return tf.reduce_mean(tf.square(x - xhat))
 
 LX = L(inp_data, DX)
-LGZ = L(GZ, DGZ)
+LGZ = L(GZ, enc)
 
 
 discriminator_loss =  LX - inp_k * LGZ
