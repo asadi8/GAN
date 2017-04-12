@@ -4,7 +4,7 @@ import network_helpers as nh
 
 def hook_discriminator(inp):
     with tf.variable_scope('c1'):
-        c1 = nh.downConvolution(inp, 5, 1, 3, 128, conv_stride=2) # 14 x 14 x 32
+        c1 = nh.downConvolution(inp, 5, 1, 1, 128, conv_stride=2) # 14 x 14 x 32
     with tf.variable_scope('c2'):
         c2 = nh.downConvolution(c1, 5, 1, 128, 64, conv_stride=2) # 7 x 7 x 64
         c2 = tf.reshape(c2, [-1, 7*7*64])
@@ -19,32 +19,32 @@ def hook_discriminator(inp):
 
 def discriminator_autoencoder(inp):
     with tf.variable_scope('c1'):
-        c1 = nh.downConvolution(inp, 5, 1, 3, 128, conv_stride=2) # 14 x 14 x 32
+        c1 = nh.downConvolution(inp, 5, 1, 1, 32, conv_stride=2) # 14 x 14 x 32
     with tf.variable_scope('c2'):
-        c2 = nh.downConvolution(c1, 5, 1, 128, 64, conv_stride=2) # 7 x 7 x 64
+        c2 = nh.downConvolution(c1, 5, 1, 32, 64, conv_stride=2) # 7 x 7 x 64
         c2 = tf.reshape(c2, [-1, 7*7*64])
     with tf.variable_scope('fc1'):
         fc1 = nh.fullyConnected(c2, 100, bias=0)
     with tf.variable_scope('fc2'):
-        fc2 = nh.fullyConnected(fc1, 128*7*7, bias=0.0)
-    fc2 = tf.reshape(fc2, [-1, 7, 7, 128])
+        fc2 = nh.fullyConnected(fc1, 64*7*7, bias=0.0)
+    fc2 = tf.reshape(fc2, [-1, 7, 7, 64])
     with tf.variable_scope('dc1'):
-        c1 = nh.upConvolution(fc2, 5, 128, 64, bias=0.0)
+        c1 = nh.upConvolution(fc2, 5, 64, 32, bias=0.0)
     with tf.variable_scope('dc2'):
-        c2 = nh.upConvolution(c1, 5, 64, 3, rectifier=tf.nn.sigmoid, bias=0.0)
+        c2 = nh.upConvolution(c1, 5, 32, 1, rectifier=tf.nn.sigmoid, bias=0.0)
     return c2
 
 def hook_generator(noise):
     with tf.variable_scope('fc1'):
-        fc1 = nh.fullyConnected(noise, 128*7*7, bias=0.0)
+        fc1 = nh.fullyConnected(noise, 64*7*7, bias=0.0)
     fc1 = tf.reshape(fc1, [-1, 7, 7, 128])
     with tf.variable_scope('c1'):
-        c1 = nh.upConvolution(fc1, 5, 128, 64, bias=0.0)
+        c1 = nh.upConvolution(fc1, 5, 64, 32, bias=0.0)
     with tf.variable_scope('c2'):
-        c2 = nh.upConvolution(c1, 5, 64, 3, rectifier=tf.nn.sigmoid, bias=0.0)
+        c2 = nh.upConvolution(c1, 5, 32, 1, rectifier=tf.nn.sigmoid, bias=0.0)
     return c2
 
-inp_data = tf.placeholder(tf.float32, [None, 28, 28, 3])
+inp_data = tf.placeholder(tf.float32, [None, 28, 28, 1])
 inp_noise = tf.placeholder(tf.float32, [None, 10])
 inp_k = tf.placeholder(tf.float32)
 inp_lambda = 0.001
@@ -71,6 +71,7 @@ gamma = LGZ / LX
 
 discriminator_loss =  LX - inp_k * LGZ
 generator_loss = LGZ
+loss = discriminator_loss + generator_loss
 new_k = inp_k + inp_lambda*(gamma*LX - LGZ)
 #discriminator_loss = -(tf.reduce_mean(tf.log(DX)) + tf.reduce_mean(tf.log(1 - DGZ)))
 
