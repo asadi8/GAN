@@ -19,11 +19,11 @@ def hook_discriminator(inp):
 
 def discriminator_autoencoder(inp, specified_encoding=None):
     with tf.variable_scope('fc1'):
-        fc1 = nh.fullyConnected(tf.reshape(inp, [-1, 28*28]), 500, bias=0)
+        fc1 = nh.fullyConnected(tf.reshape(inp, [-1, 28*28]), 500, bias=0, rectifier=tf.nn.elu)
     with tf.variable_scope('fc2'):
-        fc2 = nh.fullyConnected(fc1, 100, bias=0)
+        fc2 = nh.fullyConnected(fc1, 100, bias=0, rectifier=tf.nn.elu)
     with tf.variable_scope('fc3'):
-        fc3 = nh.fullyConnected(fc2, 500, bias=0)
+        fc3 = nh.fullyConnected(fc2, 500, bias=0, rectifier=tf.nn.elu)
     with tf.variable_scope('fc4'):
         fc4 = tf.reshape(nh.fullyConnected(fc3, 28*28, bias=0, rectifier=tf.nn.sigmoid), [-1, 28, 28, 1])
     return fc4
@@ -97,7 +97,7 @@ with tf.variable_scope('discriminator', reuse=True):
 #    DGZ = hook_discriminator(GZ)
 
 def L(x, xhat):
-    return tf.reduce_mean(tf.abs(x - xhat))
+    return tf.reduce_mean(tf.square(x - xhat))
 
 LZ = L(reconZ, inp_noise)
 LX = L(inp_data, DX)
