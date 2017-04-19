@@ -56,13 +56,13 @@ def hook_generator(noise):
     with tf.variable_scope('fc3'):
         fc3 = nh.fullyConnected(fc2, 28*28, bias=0, rectifier=tf.nn.sigmoid)
         image = tf.reshape(fc3, [-1, 28, 28, 1])
-    with tf.variable_scope('fc4'):
-        fc4 = nh.fullyConnected(fc3, 500, bias=0, rectifier=tf.nn.elu)
-    with tf.variable_scope('fc5'):
-        fc5 = nh.fullyConnected(fc4, 100, bias=0, rectifier=tf.nn.elu)
-    with tf.variable_scope('fc6'):
-        recon_noise = nh.fullyConnected(fc5, 10, bias=0, rectifier=lambda x: x)
-    return image, recon_noise
+    #with tf.variable_scope('fc4'):
+    #    fc4 = nh.fullyConnected(fc3, 500, bias=0, rectifier=tf.nn.elu)
+    #with tf.variable_scope('fc5'):
+    #    fc5 = nh.fullyConnected(fc4, 100, bias=0, rectifier=tf.nn.elu)
+    #with tf.variable_scope('fc6'):
+    #    recon_noise = nh.fullyConnected(fc5, 10, bias=0, rectifier=lambda x: x)
+    return image#, recon_noise
     '''with tf.variable_scope('enc'):
         fc1 = nh.fullyConnected(noise, 64*7*7, bias=0.0, rectifier=tf.nn.elu)
     fc1 = tf.reshape(fc1, [-1, 7, 7, 64])
@@ -89,7 +89,7 @@ inp_k = tf.placeholder(tf.float32)
 inp_lambda = 0.001
 gamma = 0.5
 with tf.variable_scope('generator'):
-    GZ, reconZ = hook_generator(inp_noise)
+    GZ = hook_generator(inp_noise)
 
 with tf.variable_scope('discriminator'):
     DX = discriminator_autoencoder(inp_data)
@@ -107,13 +107,12 @@ with tf.variable_scope('discriminator', reuse=True):
 def L(x, xhat):
     return tf.reduce_mean(tf.square(x - xhat))
 
-LZ = L(reconZ, inp_noise)
 LX = L(inp_data, DX)
 LGZ = L(DGZ, GZ)
 
 
 discriminator_loss =  LX - inp_k * LGZ
-generator_loss = LGZ + 10*LZ
+generator_loss = LGZ
 loss = discriminator_loss + generator_loss
 new_k = tf.clip_by_value(inp_k + inp_lambda*(gamma*LX - LGZ), 0, 1)
 #discriminator_loss = -(tf.reduce_mean(tf.log(DX)) + tf.reduce_mean(tf.log(1 - DGZ)))
