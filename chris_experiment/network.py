@@ -25,7 +25,7 @@ def discriminator_autoencoder(inp, specified_encoding=None):
             c2 = nh.downConvolution(c1, 5, 1, 32, 64, conv_stride=2, rectifier=tf.nn.elu) # 7 x 7 x 64
             c2 = tf.reshape(c2, [-1, 7*7*64])
         with tf.variable_scope('fc1'):
-            fc1 = nh.fullyConnected(c2, 5, bias=0, rectifier=tf.nn.elu)
+            fc1 = nh.fullyConnected(c2, 20, bias=0, rectifier=tf.nn.elu)
     else:
         fc1 = specified_encoding
     with tf.variable_scope('fc2'):
@@ -91,7 +91,7 @@ new_k = tf.clip_by_value(inp_k + inp_lambda*(gamma*LX - LGZ), 0, 1)
 #generator_loss = -tf.reduce_mean(tf.log(DGZ))
 
 
-learning_rate = 0.00005
+learning_rate = 0.0001
 train_gen = tf.train.AdamOptimizer(learning_rate).minimize(generator_loss, var_list=nh.get_vars('generator'))
 train_discr = tf.train.AdamOptimizer(learning_rate).minimize(discriminator_loss, var_list=nh.get_vars('discriminator'))
 
