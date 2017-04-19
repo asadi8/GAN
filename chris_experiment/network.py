@@ -49,13 +49,20 @@ def discriminator_autoencoder(inp, specified_encoding=None):
     return c2
 
 def hook_generator(noise):
-    #with tf.variable_scope('fc1'):
-    #    fc1 = nh.fullyConnected(noise, 100, bias=0, rectifier=tf.nn.elu)
-    #with tf.variable_scope('fc2'):
-    #    fc2 = nh.fullyConnected(fc1, 100, bias=0, rectifier=tf.nn.elu)
-    #with tf.variable_scope('fc3'):
-    #    enc = nh.fullyConnected(fc2, 100, bias=0, rectifier=tf.nn.elu)
-    with tf.variable_scope('enc'):
+    with tf.variable_scope('fc1'):
+        fc1 = nh.fullyConnected(noise, 100, bias=0, rectifier=tf.nn.elu)
+    with tf.variable_scope('fc2'):
+        fc2 = nh.fullyConnected(fc1, 500, bias=0, rectifier=tf.nn.elu)
+    with tf.variable_scope('fc3'):
+        fc3 = nh.fullyConnected(fc2, 28*28, bias=0, rectifier=tf.nn.sigmoid)
+        image = tf.reshape(fc3, [-1, 28, 28, 1])
+    with tf.variable_scope('fc4'):
+        fc4 = nh.fullyConnected(fc3, 500, bias=0, rectifier=tf.nn.elu)
+    with tf.variable_scope('fc5'):
+        fc5 = nh.fullyConnected(fc4, 100, bias=0, rectifier=tf.nn.elu)
+    with tf.variable_scope('fc6'):
+        recon_noise = nh.fullyConnected(fc5, 10, bias=0, rectifier=lambda x: x)
+    '''with tf.variable_scope('enc'):
         fc1 = nh.fullyConnected(noise, 64*7*7, bias=0.0, rectifier=tf.nn.elu)
     fc1 = tf.reshape(fc1, [-1, 7, 7, 64])
     with tf.variable_scope('c1'):
@@ -71,7 +78,7 @@ def hook_generator(noise):
         fc1 = nh.fullyConnected(c2, 500, bias=0, rectifier=tf.nn.elu)
     with tf.variable_scope('dfc2'):
         recon_noise = fc2 = nh.fullyConnected(fc1, 10, bias=0.0, rectifier=lambda x: x)
-    return image, recon_noise
+    return image, recon_noise'''
 
 
 
