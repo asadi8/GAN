@@ -62,6 +62,7 @@ def hook_generator(noise):
         fc5 = nh.fullyConnected(fc4, 100, bias=0, rectifier=tf.nn.elu)
     with tf.variable_scope('fc6'):
         recon_noise = nh.fullyConnected(fc5, 10, bias=0, rectifier=lambda x: x)
+    return image, recon_noise
     '''with tf.variable_scope('enc'):
         fc1 = nh.fullyConnected(noise, 64*7*7, bias=0.0, rectifier=tf.nn.elu)
     fc1 = tf.reshape(fc1, [-1, 7, 7, 64])
