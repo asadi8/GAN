@@ -21,21 +21,21 @@ def discriminator_autoencoder(inp, specified_encoding=None):
     print inp
     if specified_encoding is None:
         with tf.variable_scope('c1'):
-            c1 = nh.downConvolution(inp, 5, 1, 1, 32, conv_stride=2, rectifier=tf.nn.elu) # 14 x 14 x 32
+            c1 = nh.downConvolution(inp, 5, 1, 1, 10, conv_stride=2, rectifier=tf.nn.elu) # 14 x 14 x 32
         with tf.variable_scope('c2'):
-            c2 = nh.downConvolution(c1, 5, 1, 32, 64, conv_stride=2, rectifier=tf.nn.elu) # 7 x 7 x 64
-            c2 = tf.reshape(c2, [-1, 7*7*64])
+            c2 = nh.downConvolution(c1, 5, 1, 10, 20, conv_stride=2, rectifier=tf.nn.elu) # 7 x 7 x 64
+            c2 = tf.reshape(c2, [-1, 7*7*20])
         with tf.variable_scope('fc1'):
             fc1 = nh.fullyConnected(c2, 10, bias=0, rectifier=tf.nn.elu)
     else:
         fc1 = specified_encoding
     with tf.variable_scope('fc2'):
-        fc2 = nh.fullyConnected(fc1, 64*7*7, bias=0.0, rectifier=tf.nn.elu)
-    fc2 = tf.reshape(fc2, [-1, 7, 7, 64])
+        fc2 = nh.fullyConnected(fc1, 20*7*7, bias=0.0, rectifier=tf.nn.elu)
+    fc2 = tf.reshape(fc2, [-1, 7, 7, 20])
     with tf.variable_scope('dc1'):
-        c1 = nh.upConvolution(fc2, 5, 64, 32, bias=0.0, rectifier=tf.nn.elu)
+        c1 = nh.upConvolution(fc2, 5, 20, 10, bias=0.0, rectifier=tf.nn.elu)
     with tf.variable_scope('dc2'):
-        c2 = nh.upConvolution(c1, 5, 32, 1, rectifier=tf.nn.sigmoid, bias=0.0)
+        c2 = nh.upConvolution(c1, 5, 10, 1, rectifier=tf.nn.sigmoid, bias=0.0)
     return fc1, c2
 
 def hook_generator(noise):
