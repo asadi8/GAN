@@ -23,7 +23,7 @@ def train_model(num_steps=-1, gen_name='generator', discr_name='discriminator', 
                  network.inp_k: k})
 
 
-        [_, gen_loss, gen_image, new_k] = network.sess.run([network.train_gen, network.generator_loss, network.DGZ, network.new_k], feed_dict={
+        [_, gen_loss, gen_image, recon_image, new_k] = network.sess.run([network.train_gen, network.generator_loss, network.DGZ, network.DX, network.new_k], feed_dict={
             network.inp_data: data,
             network.inp_noise: noise,
             network.inp_k: k
@@ -41,6 +41,7 @@ def train_model(num_steps=-1, gen_name='generator', discr_name='discriminator', 
             for j in range(5):
                 ii = np.random.randint(0,3)
                 cv2.imwrite('./recent%s.png' % str(j), 255*gen_image[j][:, :, 0])
+            cv2.imwrite('./recon.png', 255*recon_image[0][:, :, 0])
         if i % save_interval == 0:
             network.saver_discr.save(network.sess, './'+discr_name+'.ckpt')
             network.saver_gen.save(network.sess, './'+gen_name+'.ckpt')
