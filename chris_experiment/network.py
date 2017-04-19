@@ -104,7 +104,7 @@ LX = L(inp_data, DX)
 LGZ = L(DGZ, GZ)
 
 
-discriminator_loss =  LX #- inp_k * LGZ
+discriminator_loss =  LX - inp_k * LGZ
 generator_loss = LGZ + 10*LZ
 loss = discriminator_loss + generator_loss
 new_k = tf.clip_by_value(inp_k + inp_lambda*(gamma*LX - LGZ), 0, 1)
