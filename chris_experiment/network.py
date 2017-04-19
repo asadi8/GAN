@@ -87,7 +87,7 @@ inp_data = tf.placeholder(tf.float32, [None, 28, 28, 1])
 inp_noise = tf.placeholder(tf.float32, [None, 10])
 inp_k = tf.placeholder(tf.float32)
 inp_lambda = 0.001
-gamma = 0.5
+gamma = 0.9
 with tf.variable_scope('generator'):
     GZ = hook_generator(inp_noise)
 
