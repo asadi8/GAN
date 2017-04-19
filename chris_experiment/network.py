@@ -4,15 +4,15 @@ import network_helpers as nh
 
 def hook_discriminator(inp):
     with tf.variable_scope('c1'):
-        c1 = nh.downConvolution(inp, 5, 1, 1, 128, conv_stride=2) # 14 x 14 x 32
+        c1 = nh.downConvolution(inp, 5, 1, 1, 128, conv_stride=2, rectifier=tf.nn.elu) # 14 x 14 x 32
     with tf.variable_scope('c2'):
-        c2 = nh.downConvolution(c1, 5, 1, 128, 64, conv_stride=2) # 7 x 7 x 64
+        c2 = nh.downConvolution(c1, 5, 1, 128, 64, conv_stride=2, rectifier=tf.nn.elu) # 7 x 7 x 64
         c2 = tf.reshape(c2, [-1, 7*7*64])
 
     with tf.variable_scope('fc1'):
-        fc1 = nh.fullyConnected(c2, 500, bias=0)
+        fc1 = nh.fullyConnected(c2, 500, bias=0, rectifier=tf.nn.elu)
     with tf.variable_scope('fc2'):
-        fc2 = nh.fullyConnected(fc1, 100, bias=0.0)
+        fc2 = nh.fullyConnected(fc1, 100, bias=0.0, rectifier=tf.nn.elu)
     with tf.variable_scope('fc3'):
         out = nh.fullyConnected(fc2, 1, rectifier=tf.nn.sigmoid, bias=0.0)
     return out
@@ -20,19 +20,19 @@ def hook_discriminator(inp):
 def discriminator_autoencoder(inp, specified_encoding=None):
     if specified_encoding is None:
         with tf.variable_scope('c1'):
-            c1 = nh.downConvolution(inp, 5, 1, 1, 32, conv_stride=2) # 14 x 14 x 32
+            c1 = nh.downConvolution(inp, 5, 1, 1, 32, conv_stride=2, rectifier=tf.nn.elu) # 14 x 14 x 32
         with tf.variable_scope('c2'):
-            c2 = nh.downConvolution(c1, 5, 1, 32, 64, conv_stride=2) # 7 x 7 x 64
+            c2 = nh.downConvolution(c1, 5, 1, 32, 64, conv_stride=2, rectifier=tf.nn.elu) # 7 x 7 x 64
             c2 = tf.reshape(c2, [-1, 7*7*64])
         with tf.variable_scope('fc1'):
-            fc1 = nh.fullyConnected(c2, 5, bias=0, rectifier=tf.nn.tanh)
+            fc1 = nh.fullyConnected(c2, 5, bias=0, rectifier=tf.nn.elu)
     else:
         fc1 = specified_encoding
     with tf.variable_scope('fc2'):
-        fc2 = nh.fullyConnected(fc1, 64*7*7, bias=0.0)
+        fc2 = nh.fullyConnected(fc1, 64*7*7, bias=0.0, rectifier=tf.nn.elu)
     fc2 = tf.reshape(fc2, [-1, 7, 7, 64])
     with tf.variable_scope('dc1'):
-        c1 = nh.upConvolution(fc2, 5, 64, 32, bias=0.0)
+        c1 = nh.upConvolution(fc2, 5, 64, 32, bias=0.0, rectifier=tf.nn.elu)
     with tf.variable_scope('dc2'):
         c2 = nh.upConvolution(c1, 5, 32, 1, rectifier=tf.nn.sigmoid, bias=0.0)
     return fc1, c2
@@ -75,7 +75,7 @@ with tf.variable_scope('discriminator', reuse=True):
 #    DGZ = hook_discriminator(GZ)
 
 def L(x, xhat):
-    return tf.reduce_mean(tf.square(x - xhat))
+    return tf.reduce_mean(tf.abs(x - xhat))
 
 LX = L(inp_data, DX)
 LGZ = L(DGZ, GZ)
@@ -91,7 +91,7 @@ new_k = tf.clip_by_value(inp_k + inp_lambda*(gamma*LX - LGZ), 0, 1)
 #generator_loss = -tf.reduce_mean(tf.log(DGZ))
 
 
-learning_rate = 0.0001
+learning_rate = 0.00005
 train_gen = tf.train.AdamOptimizer(learning_rate).minimize(generator_loss, var_list=nh.get_vars('generator'))
 train_discr = tf.train.AdamOptimizer(learning_rate).minimize(discriminator_loss, var_list=nh.get_vars('discriminator'))
 
