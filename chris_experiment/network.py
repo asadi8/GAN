@@ -18,7 +18,16 @@ def hook_discriminator(inp):
     return out
 
 def discriminator_autoencoder(inp, specified_encoding=None):
-    print inp
+    with tf.variable_scope('fc1'):
+        fc1 = nh.fullyConnected(tf.reshape(inp, [-1, 28*28]), 500, bias=0, rectifier=tf.nn.elu)
+    with tf.variable_scope('fc2'):
+        fc2 = nh.fullyConnected(fc1, 100, bias=0, rectifier=tf.nn.elu)
+    with tf.variable_scope('fc3'):
+        fc3 = nh.fullyConnected(fc2, 500, bias=0, rectifier=tf.nn.elu)
+    with tf.variable_scope('fc4'):
+        fc4 = tf.reshape(nh.fullyConnected(fc3, 28*28, bias=0, rectifier=tf.nn.sigmoid), [-1, 28, 28, 1])
+    return fc4
+    '''print inp
     if specified_encoding is None:
         with tf.variable_scope('c1'):
             c1 = nh.downConvolution(inp, 5, 1, 1, 10, conv_stride=2, rectifier=tf.nn.elu) # 14 x 14 x 32
@@ -35,8 +44,9 @@ def discriminator_autoencoder(inp, specified_encoding=None):
     with tf.variable_scope('dc1'):
         c1 = nh.upConvolution(fc2, 5, 20, 10, bias=0.0, rectifier=tf.nn.elu)
     with tf.variable_scope('dc2'):
-        c2 = nh.upConvolution(c1, 5, 10, 1, rectifier=tf.nn.sigmoid, bias=0.0)
-    return fc1, c2
+        c2 = nh.upConvolution(c1, 5, 10, 1, rectifier=tf.nn.sigmoid, bias=0.0)'''
+
+    return c2
 
 def hook_generator(noise):
     #with tf.variable_scope('fc1'):
@@ -74,11 +84,11 @@ with tf.variable_scope('generator'):
     GZ, reconZ = hook_generator(inp_noise)
 
 with tf.variable_scope('discriminator'):
-    enc, DX = discriminator_autoencoder(inp_data)
+    DX = discriminator_autoencoder(inp_data)
 
 with tf.variable_scope('discriminator', reuse=True):
     print GZ
-    encGZ, DGZ = discriminator_autoencoder(GZ)
+    DGZ = discriminator_autoencoder(GZ)
 
 
 #with tf.variable_scope('discriminator'):
